@@ -1,0 +1,10 @@
+Risk calculator
+
+pip install openpyxl
+pip install requests
+pip install GDAL
+pip install pyproj
+pip install fiona
+pip install shapely
+pip install geopandas
+pip install rasterio
