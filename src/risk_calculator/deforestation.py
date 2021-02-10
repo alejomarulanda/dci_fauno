@@ -58,10 +58,15 @@ def download_deforestation(inputs, url_base, file_name_base, years):
 def getFeatures(gdf):    
     return [json.loads(gdf.to_json())['features'][0]['geometry']]
 
-# 
-def reproject_raster(source, destiny, dst_crs):
+# Method which reproject a raster to specifc system and pixel size
+# (string) source: Path of the source raster file
+# (string) destination: Path of the destination raster file
+# (string) dst_crs: New system CRS of destination
+# (double) pixel_size: New pixel size
+def reproject_raster(source, destination, dst_crs, pixel_size):
     with rio.open(source) as src:
         transform, width, height = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds)
+        transform = Affine(pixel_size, transform.b, transform.c, transform.d, -pixel_size, transform.f)
         kwargs = src.meta.copy()
         kwargs.update({
             'crs': dst_crs,
@@ -71,7 +76,7 @@ def reproject_raster(source, destiny, dst_crs):
             'compress': 'lzw'
         })
 
-        with rio.open(destiny, 'w', **kwargs) as dst:
+        with rio.open(destination, 'w', **kwargs) as dst:
             for i in range(1, src.count + 1):
                 reproject(
                     source=rio.band(src, i),
@@ -86,8 +91,9 @@ def reproject_raster(source, destiny, dst_crs):
 # It crops and resamples all raster files to same dimention based on the small area of all rasters.
 # (string) inputs: Path where inputs files should be located
 # (int) def_value: It is the value for deforestation pixels
+# (int) dst_crs: New system CRS of destination
 # (float) pixel_size: Define the value for pixels dimension for all new rasters
-def extract_deforestation(inputs, def_value, pixel_size):
+def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
     # Creates output folder
     outputs_folder = os.path.join(inputs,"fixed")
     if not os.path.exists(outputs_folder):
@@ -96,7 +102,6 @@ def extract_deforestation(inputs, def_value, pixel_size):
     pattern = inputs + os.path.sep + "content" + os.path.sep + '**' + os.path.sep + '**.tif'
     files = glob.glob(pattern, recursive=True)    
     # Parameters
-    meta_ref = None
     minx, miny, maxx, maxy = 0, 0, 0, 0
     crs = None
     epsg_code = None
@@ -108,7 +113,6 @@ def extract_deforestation(inputs, def_value, pixel_size):
             raster_meta = raster.meta.copy()
             # Copying the first metadata
             if idx == 0:
-                #meta_ref = raster.meta.copy()
                 crs = raster.crs
                 minx, miny, maxx, maxy = raster.bounds[0], raster.bounds[1], raster.bounds[2], raster.bounds[3]                
             # Checking which is the min left corner 
@@ -124,63 +128,46 @@ def extract_deforestation(inputs, def_value, pixel_size):
     bbox = box(minx, miny, maxx, maxy)
     print("Bounds: " + str(bbox))    
     geo = gpd.GeoDataFrame({'geometry': bbox}, index=[0], crs=crs.data)
-    geo = geo.to_crs(crs = from_epsg(3116))
+    geo = geo.to_crs(crs = from_epsg(dst_crs))
     coords = getFeatures(geo)
-    #meta_ref['nodata'] = 0
     
     # loop for extracting, cropping and resampling raster files (*.tif)
     for rf in files:
         print("Working: " + rf)
         
+        # Reproject the original raster and creates a tmp file
         rf_paths = rf.split(os.path.sep)
         rf_tmp = rf_paths[len(rf_paths)-1].replace(".tif","_tmp.tif")  
         rf_tmp = outputs_folder + os.path.sep + rf_tmp
         print("Reprojecting: " + rf_tmp)
-        reproject_raster(rf, rf_tmp, 'EPSG:3116')
+        reproject_raster(rf, rf_tmp, 'EPSG:' + str(dst_crs), pixel_size)
         
         print("Opening: " + rf_tmp)
         with rio.open(rf_tmp) as raster:
+            # Copy meta data from tmp file reprojected
             meta_dst = raster.meta.copy()
             
             print("Cropping raster")
-            out_img, out_transform = mask(dataset=raster, shapes=coords, crop=True)
-            # Transform
-            transform = Affine(pixel_size, out_transform.b, out_transform.c, out_transform.d, -pixel_size, out_transform.f)
+            out_img, out_transform = mask(dataset=raster, shapes=coords, crop=True)            
+            
             # Extract values deforestation
             out_img[out_img != def_value] = 0
-            # 
             meta_dst.update({"driver": "GTiff",
                  "height": out_img.shape[1],
                  "width": out_img.shape[2],
                  "transform": out_transform,
                  'compress': 'lzw',
                  'nodata': 0})
-                 
-            print("Saving tmp")
-            dest_file_tmp = os.path.join(outputs_folder, rf_paths[len(rf_paths)-1].replace(".tif","_tmp2.tif"))
-            with rio.open(dest_file_tmp, 'w', **meta_dst) as dst:
-                dst.write(out_img)
             
-            print("Resampling raster")
-            with rio.open(dest_file_tmp) as src:                
-                meta_dst = src.meta.copy()
-                arr = src.read(1)
-                meta_dst.update({"driver": "GTiff",
-                                 "transform": transform,
-                                'compress': 'lzw'})
-                
-                dest_file = os.path.join(outputs_folder, rf_paths[len(rf_paths)-1])
-                print("Saving: " + dest_file)                
-                with rio.open(dest_file, 'w', **meta_dst) as dst:
-                    for i in range(1, src.count + 1):
-                        reproject(
-                            source=rio.band(src, i),
-                            destination=rio.band(dst, i),
-                            src_transform=src.transform,
-                            src_crs=src.crs,
-                            dst_transform=transform,
-                            dst_crs=src.crs,
-                            resampling=Resampling.nearest)
+            dest_file = os.path.join(outputs_folder, rf_paths[len(rf_paths)-1])
+            print("Saving: " + dest_file)
+            with rio.open(dest_file, 'w', **meta_dst) as dst:
+                dst.write(out_img)
+        
+        # Delete the tmp file
+        print("Deleting tmp: " + rf_tmp)        
+        os.remove(rf_tmp)
+            
             
 
 # Method which summarize all deforestation raster in just one
@@ -202,6 +189,7 @@ def summary_deforestation(inputs):
                 meta_ref = raster.meta.copy()
             summary = summary + array
     summary[summary != 0] = 2
+    meta_ref.update({'compress': 'lzw'})
     dest_file = os.path.join(outputs_folder,"summary.tif")            
     print("Saving: " + dest_file)
     with rio.open(dest_file, "w", **meta_ref) as dest:
