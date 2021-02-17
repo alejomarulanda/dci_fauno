@@ -2,6 +2,8 @@ import os
 import requests
 import zipfile
 import glob
+from fiona.crs import from_epsg
+import geopandas as gpd
 
 # Method which download data from url. It creates a set of subfolders to downloaded files and other
 # for unzipped files
@@ -36,3 +38,27 @@ def download_data(inputs, url):
     with zipfile.ZipFile(os.path.join(download_folder,file_name),"r") as zip_ref:
         print("Extracting: " + download_folder + file_name)
         zip_ref.extractall(content_folder)
+
+# Method that reprojects 
+# (string) inputs: Path where inputs files should be located
+# (int) dst_crs: New system CRS of destination
+def reproject_source(inputs, dst_crs, adm1_name, adm1_id, adm2_name, adm2_id, adm3_name, adm3_id, area, geometry):
+    content_folder = os.path.join(inputs,"content")
+    # Creates output folder
+    outputs_folder = os.path.join(inputs,"fixed")
+    if not os.path.exists(outputs_folder):
+        os.mkdir(outputs_folder)
+    
+    pattern = inputs + os.path.sep + "content" + os.path.sep + '**' + os.path.sep + '**.shp'
+    files = glob.glob(pattern, recursive=True)
+    print("Opening the first file: " + files[0])
+    data = gpd.read_file(files[0])
+    print("Reprojecting")
+    data = data.to_crs(crs = from_epsg(dst_crs))
+    data = data[[adm1_id,adm1_name,adm2_id,adm2_name,adm3_id,adm3_name,area,geometry]]
+    data.columns = ["adm1_id","adm1_name","adm2_id","adm2_name","adm3_id","adm3_name","area","geometry"]
+    print(data.head())
+    
+    output_file = os.path.join(outputs_folder,"adm.shp")
+    print("Saving: " + output_file)
+    data.to_file(output_file)

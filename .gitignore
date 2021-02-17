@@ -1,6 +1,7 @@
 # Data
 /data/risk_calculator/inputs
 /data/risk_calculator/outputs
+/data/risk_calculator/logs
 
 # Python
 */__pycache__
