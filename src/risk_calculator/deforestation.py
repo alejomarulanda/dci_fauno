@@ -8,10 +8,13 @@ from rasterio.mask import mask
 from rasterio import Affine
 from rasterio.merge import merge
 from shapely.geometry import box
+import fiona
 from fiona.crs import from_epsg
 import geopandas as gpd
 import json
 from rasterio.warp import calculate_default_transform, reproject, Resampling
+from rasterio.features import shapes
+from shapely.geometry import shape
 
 # Method which download data from url. It creates a set of subfolders to downloaded files and other
 # for unzipped files
@@ -98,6 +101,9 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
     outputs_folder = os.path.join(inputs,"fixed")
     if not os.path.exists(outputs_folder):
         os.mkdir(outputs_folder)
+    detail_folder = os.path.join(outputs_folder,"raster_detail")
+    if not os.path.exists(detail_folder):
+        os.mkdir(detail_folder)
     # Listing files
     pattern = inputs + os.path.sep + "content" + os.path.sep + '**' + os.path.sep + '**.tif'
     files = glob.glob(pattern, recursive=True)    
@@ -159,7 +165,10 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
                  'compress': 'lzw',
                  'nodata': 0})
             
-            dest_file = os.path.join(outputs_folder, rf_paths[len(rf_paths)-1])
+            file_name = rf_paths[len(rf_paths)-1]
+            file_len = len(file_name)
+            file_name = file_name[file_len-13:file_len-9]
+            dest_file = os.path.join(detail_folder, file_name + ".tif")
             print("Saving: " + dest_file)
             with rio.open(dest_file, 'w', **meta_dst) as dst:
                 dst.write(out_img)
@@ -170,11 +179,16 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
             
             
 
-# Method which summarize all deforestation raster in just one
+# Method which acummulates all deforestation raster for all years
 # (string) inputs: Path where inputs files should be located
-def summary_deforestation(inputs):
+def summary_deforestation(inputs):    
     outputs_folder = os.path.join(inputs, "fixed")
-    files = glob.glob(outputs_folder + os.path.sep + "*.tif")
+    detail_folder = os.path.join(outputs_folder,"raster_detail")
+    # Crating output folder for summary
+    summary_folder = os.path.join(outputs_folder,"raster_summary")
+    if not os.path.exists(summary_folder):
+        os.mkdir(summary_folder)
+    files = glob.glob(detail_folder + os.path.sep + "*.tif")
     summary = None
     meta_ref = None
     # Loop to compile all deforestation rasters
@@ -183,17 +197,62 @@ def summary_deforestation(inputs):
         print(rf)
         with rio.open(rf) as raster:
             # Extract values deforestation
-            array = raster.read()        
+            array = raster.read()    
+            # Check if it is the first raster
             if idx == 0:
                 summary = array
                 meta_ref = raster.meta.copy()
+            # Acummulating data
             summary = summary + array
-    summary[summary != 0] = 2
-    meta_ref.update({'compress': 'lzw'})
-    dest_file = os.path.join(outputs_folder,"summary.tif")            
-    print("Saving: " + dest_file)
-    with rio.open(dest_file, "w", **meta_ref) as dest:
-        dest.write(summary)
+        # Clear data for deforestation values
+        summary[summary != 0] = 2
+        # Compressing the output
+        meta_ref.update({'compress': 'lzw'})
+        
+        rf_paths = rf.split(os.path.sep)
+        dest_file = os.path.join(summary_folder,rf_paths[len(rf_paths) - 1])            
+        print("Saving: " + dest_file)
+        with rio.open(dest_file, "w", **meta_ref) as dest:
+            dest.write(summary)
+
+# Method that transforms raster files to shapefiles.
+# This methods applies the transformation for detail and summary files
+# (string) inputs: Path where inputs files should be located
+def to_shp(inputs):
+    outputs_folder = os.path.join(inputs, "fixed")
+    folders = ["detail", "summary"]
+    crs = None
+    for fo in folders:
+        # Creates outputs folders
+        raster_folder = os.path.join(outputs_folder,"raster_" + fo) 
+        shp_folder = os.path.join(outputs_folder,"shp_" + fo)
+        if not os.path.exists(shp_folder):
+            os.mkdir(shp_folder)
+
+        files = glob.glob(raster_folder + os.path.sep + "*.tif")
+        for rf in files:
+            print("Opening: " + rf)        
+            with rio.open(rf) as src:
+                image = src.read()
+                mask = None
+                crs = src.crs
+
+                print("Transforming")
+                results = ({'properties': {'raster_val': v}, 'geometry': s} for i, (s, v) in enumerate(shapes(image, mask=mask, transform=src.meta['transform'])))
+
+            print("Creating shapefile crs: " + str(crs.data))
+            geoms = list(results)    
+            gdf  = gpd.GeoDataFrame.from_features(geoms,crs = crs.data)
+
+            rf_paths = rf.split(os.path.sep)
+            # Cretae folder for the shapefile
+            f_folder = os.path.join(shp_folder,rf_paths[len(rf_paths) - 1].replace(".tif",""))
+            if not os.path.exists(f_folder):
+                os.mkdir(f_folder)
+            dest_file = os.path.join(f_folder,"shapefile.shp")
+            print("Saving: " + dest_file)    
+            gdf.to_file(dest_file)
+        
     
     
                     
