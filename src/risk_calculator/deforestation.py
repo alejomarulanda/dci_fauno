@@ -118,6 +118,7 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
     # loop for getting parameters of all raster files (*.tif)
     print("Calculating parameters for new files")
     for idx,rf in enumerate(files):
+        print("file: " + rf)
         with rio.open(rf) as raster:
             raster_meta = raster.meta.copy()
             # Copying the first metadata
@@ -125,12 +126,14 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
                 crs = raster.crs
                 minx, miny, maxx, maxy = raster.bounds[0], raster.bounds[1], raster.bounds[2], raster.bounds[3]
             # Checking which is the min left corner 
-            if raster.bounds[0] > minx and raster.bounds[1] > miny:
+            if raster.bounds[0] > minx:
                 minx = raster.bounds[0]
+            if raster.bounds[1] > miny:
                 miny = raster.bounds[1]             
             # Checking which is the min right corner 
-            if raster.bounds[2] < maxx and raster.bounds[3] < maxy:
+            if raster.bounds[2] < maxx:
                 maxx = raster.bounds[2]
+            if raster.bounds[3] < maxy:
                 maxy = raster.bounds[3]
     
     # Creating polygon to crop the rasters files.
@@ -160,7 +163,7 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
             
             print("Cropping raster")
             out_img, out_transform = mask(dataset=raster, shapes=coords, crop=True)            
-            
+            print("Dimention: H=" + str(out_img.shape[1]) + " W=" + str(out_img.shape[2]))
             # Extract values deforestation
             out_img[out_img != def_value] = 0
             meta_dst.update({"driver": "GTiff",
@@ -207,7 +210,7 @@ def summary_deforestation(inputs):
             if idx == 0:
                 summary = array
                 meta_ref = raster.meta.copy()
-            # Acummulating data
+            # Acummulating data            
             summary = summary + array
         # Clear data for deforestation values
         summary[summary != 0] = 2

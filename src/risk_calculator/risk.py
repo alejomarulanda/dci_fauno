@@ -17,17 +17,16 @@ def deforestation_plot(inputs, years, types_analysis, pixel_size):
     if not os.path.exists(outputs_folder):
         os.mkdir(outputs_folder)
 
-    # Loop for type of analysis, they can be detail or summary
-    for ta in types_analysis:
-        
-        # Loop for years which want to be analyzed
-        for y in years:    
-            print("Processing: " + ta + " " + str(y))
+    file_bu = os.path.join(in_buffer_root,"buffer.shp")
+    print("Opening shp: " + file_bu)    
+    with fiona.open(file_bu, 'r') as shp:
+        # Loop for type of analysis, they can be detail or summary
+        for ta in types_analysis:
+            print("Type of analysis: " + ta)
+            # Loop for years which want to be analyzed
+            for y in years:    
+                print("Processing: " + str(y))
 
-            file_bu = os.path.join(in_buffer_root,str(y),"buffer.shp")
-            print("Opening shp: " + file_bu)    
-            with fiona.open(file_bu, 'r') as shp:
-            
                 in_def_root = os.path.join(inputs,"def","fixed","raster_" + ta)
 
                 # Setting the path for files: shapefile and raster            
