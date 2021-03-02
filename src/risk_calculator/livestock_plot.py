@@ -1,6 +1,7 @@
 # Import libraries
 import os
 import glob
+import math
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -146,7 +147,11 @@ def create_buffer(inputs, size_regions, dst_crs):
 
         print("Creating buffer")
         buffered = gdf_plots_buf.copy()
+        # buffer radio = animals/ field capacity
         buffered['geometry'] = buffered.apply(lambda x: x.geometry.buffer(x.animals / x.field_capacity), axis=1)
+        # buffer area = pi x r^2
+        #buffered['area'] = buffered.apply(lambda x: math.pi * ((x.animals / x.field_capacity)**2), axis=1)
+        buffered['area'] = buffered['geometry'].area
 
         print("Reprojecting")
         buffered = buffered.to_crs(crs = from_epsg(dst_crs))

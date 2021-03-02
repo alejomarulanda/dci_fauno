@@ -8,3 +8,4 @@ pip install fiona
 pip install shapely
 pip install geopandas
 pip install rasterio
+pip install rasterstats

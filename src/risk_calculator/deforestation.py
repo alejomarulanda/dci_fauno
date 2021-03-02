@@ -69,6 +69,7 @@ def getFeatures(gdf):
 def reproject_raster(source, destination, dst_crs, pixel_size):
     with rio.open(source) as src:
         transform, width, height = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds)
+        
         transform = Affine(pixel_size, transform.b, transform.c, transform.d, -pixel_size, transform.f)
         kwargs = src.meta.copy()
         kwargs.update({
@@ -78,17 +79,19 @@ def reproject_raster(source, destination, dst_crs, pixel_size):
             'height': height,
             'compress': 'lzw'
         })
-
+        
         with rio.open(destination, 'w', **kwargs) as dst:
             for i in range(1, src.count + 1):
                 reproject(
-                    source=rio.band(src, i),
-                    destination=rio.band(dst, i),
-                    src_transform=src.transform,
-                    src_crs=src.crs,
-                    dst_transform=transform,
-                    dst_crs=dst_crs,
-                    resampling=Resampling.nearest)
+                        source=rio.band(src, i),
+                        destination=rio.band(dst, i),
+                        src_transform=src.transform,
+                        src_crs=src.crs,
+                        dst_transform=transform,
+                        dst_crs=dst_crs,
+                        resampling=Resampling.nearest)
+            
+        
 
 # Method which extracts deforestation pixels for all raster files.
 # It crops and resamples all raster files to same dimention based on the small area of all rasters.
@@ -120,7 +123,7 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
             # Copying the first metadata
             if idx == 0:
                 crs = raster.crs
-                minx, miny, maxx, maxy = raster.bounds[0], raster.bounds[1], raster.bounds[2], raster.bounds[3]                
+                minx, miny, maxx, maxy = raster.bounds[0], raster.bounds[1], raster.bounds[2], raster.bounds[3]
             # Checking which is the min left corner 
             if raster.bounds[0] > minx and raster.bounds[1] > miny:
                 minx = raster.bounds[0]
@@ -132,7 +135,8 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
     
     # Creating polygon to crop the rasters files.
     bbox = box(minx, miny, maxx, maxy)
-    print("Bounds: " + str(bbox))    
+    print("Bounds: " + str(bbox))
+    print("CRS: " + str(crs))
     geo = gpd.GeoDataFrame({'geometry': bbox}, index=[0], crs=crs.data)
     geo = geo.to_crs(crs = from_epsg(dst_crs))
     coords = getFeatures(geo)
@@ -146,6 +150,7 @@ def extract_deforestation(inputs, def_value, dst_crs, pixel_size):
         rf_tmp = rf_paths[len(rf_paths)-1].replace(".tif","_tmp.tif")  
         rf_tmp = outputs_folder + os.path.sep + rf_tmp
         print("Reprojecting: " + rf_tmp)
+        
         reproject_raster(rf, rf_tmp, 'EPSG:' + str(dst_crs), pixel_size)
         
         print("Opening: " + rf_tmp)
