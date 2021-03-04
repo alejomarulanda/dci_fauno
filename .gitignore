@@ -13,4 +13,4 @@
 */.ipynb_checkpoints/*
 
 # Secrets
-/
+/src/service/app.py
