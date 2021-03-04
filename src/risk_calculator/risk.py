@@ -54,7 +54,10 @@ def deforestation_plot(inputs, years, types_analysis, pixel_size):
                     print("Saving: " + output_file)
                     gdf.to_file(output_file)
                     
-#
+# Method that calculates distance between a point and shapes.
+# It just calculates distance for the near shape
+# (geometry) point: Point which should be compare with polygons
+# (list(geometry)) pts: List of polygons which should be compared
 def near_distance(point, pts):
     # find the nearest point and return the corresponding value
     nearest = nearest_points(point, pts)[1]
@@ -93,7 +96,7 @@ def distance_plot(inputs, years, types_analysis):
             pts = shp_def.geometry.unary_union
             
             print("Calculating distances")
-            shp_areas['def_distance'] = shp_areas.apply(lambda row: near_distance(row.geometry, pts), axis=1)
+            shp_areas['def_distance'] = shp_areas.apply(lambda row: near_distance(row.centroid, pts), axis=1)
             
             f_folder = os.path.join(outputs_folder, ta)
             if not os.path.exists(f_folder):
