@@ -14,7 +14,8 @@ import geopandas as gpd
 import json
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 from rasterio.features import shapes
-from shapely.geometry import shape
+from shapely.geometry import shape, Point
+import pandas as pd
 
 # Method which download data from url. It creates a set of subfolders to downloaded files and other
 # for unzipped files
@@ -239,18 +240,24 @@ def to_shp(inputs):
 
         files = glob.glob(raster_folder + os.path.sep + "*.tif")
         for rf in files:
-            print("Opening: " + rf)        
+            print("Opening: " + rf)  
+            results = pd.DataFrame()      
             with rio.open(rf) as src:
                 image = src.read()
                 mask = None
                 crs = src.crs
 
-                print("Transforming")
-                results = ({'properties': {'raster_val': v}, 'geometry': s} for i, (s, v) in enumerate(shapes(image, mask=mask, transform=src.meta['transform'])))
+                print("Transforming")                      
+                #results = ({'properties': {'raster_val': v}, 'geometry': s} for i, (s, v) in enumerate(shapes(image, mask=mask, transform=src.meta['transform'])))
+                results = pd.DataFrame([src.xy(x,y) for x in np.arange(image.shape[1]) for y in np.arange(image.shape[2]) if int(image[0][x][y]) == 2], columns=["lon","lat"])
 
             print("Creating shapefile crs: " + str(crs.data))
-            geoms = list(results)    
-            gdf  = gpd.GeoDataFrame.from_features(geoms,crs = crs.data)
+            print(results.head())
+            #geoms = list(results)    
+            #gdf  = gpd.GeoDataFrame.from_features(geoms,crs = crs.data)
+            gdf = gpd.GeoDataFrame(df, geometry=geopandas.points_from_xy(results.lon, results.lat),crs = crs.data)
+            print(gdf.head())
+            #gdf  = gpd.GeoDataFrame.from_features(results,crs = crs.data)
 
             rf_paths = rf.split(os.path.sep)
             # Cretae folder for the shapefile
