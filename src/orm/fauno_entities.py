@@ -1,15 +1,17 @@
 from mongoengine import *
 
-class Region(Document):
+class AdministrativeLevel(Document):
     name = StringField(required=True)
-    field_capacity = FloatField(required=True)
+    adm = StringField(required=True)
+    ext_id = StringField(required=True)
     enable = BooleanField(required=True)
     created = DateTimeField(required=True)
     updated = DateTimeField(required=True)
 
 class Locality(Document):
-    region =  ReferenceField(Region)
+    adm_level =  ReferenceField(AdministrativeLevel)
     name = StringField(required=True)    
+    ext_id = StringField(required=True)
     enable = BooleanField(required=True)
     created = DateTimeField(required=True)
     updated = DateTimeField(required=True)
@@ -58,6 +60,7 @@ class Animals(EmbeddedDocument):
     amount = IntField(required=True)
 
 class CattleRancherNetwork(Document):
+    analysis = ReferenceField(Analysis)
     source = ReferenceField(CattleRancher)
     destination = ReferenceField(CattleRancher)
     mobilization = ListField(EmbeddedDocumentField(Animals))
@@ -73,3 +76,9 @@ class LocalityRisk(Document):
     degree_out = FloatField(required=True)
     betweenness = FloatField(required=True)
     closeness = FloatField(required=True)
+
+class LocalityNetwork(Document):    
+    analysis = ReferenceField(Analysis)
+    source = ReferenceField(Locality)
+    destination = ReferenceField(Locality)
+    mobilization = ListField(EmbeddedDocumentField(Animals))
