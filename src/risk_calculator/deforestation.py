@@ -251,12 +251,10 @@ def to_shp(inputs):
                 #results = ({'properties': {'raster_val': v}, 'geometry': s} for i, (s, v) in enumerate(shapes(image, mask=mask, transform=src.meta['transform'])))
                 results = pd.DataFrame([src.xy(x,y) for x in np.arange(image.shape[1]) for y in np.arange(image.shape[2]) if int(image[0][x][y]) == 2], columns=["lon","lat"])
 
-            print("Creating shapefile crs: " + str(crs.data))
-            print(results.head())
+            print("Creating shapefile crs: " + str(crs.data))            
             #geoms = list(results)    
             #gdf  = gpd.GeoDataFrame.from_features(geoms,crs = crs.data)
-            gdf = gpd.GeoDataFrame(df, geometry=geopandas.points_from_xy(results.lon, results.lat),crs = crs.data)
-            print(gdf.head())
+            gdf = gpd.GeoDataFrame(results, geometry=gpd.points_from_xy(results.lon, results.lat),crs = crs.data)
             #gdf  = gpd.GeoDataFrame.from_features(results,crs = crs.data)
 
             rf_paths = rf.split(os.path.sep)
