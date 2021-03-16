@@ -134,7 +134,9 @@ def distance_plot(inputs, years, types_analysis):
             print("Saving: " + output_file)
             shp_areas.to_file(output_file)
 
-
+# Method which calculates 
+# (GeoDataFrame) gdf_chunk: GeoDataFrame, which has data, in which the system should calculate direct risk for each row
+# (string) param: It is a dummy parameter, in order to implement parallelization. The value does not matter
 def calculate_risk_direct(gdf_chunk, param):    
     for index, row in gdf_chunk.iterrows(): # Iterate over the chunk
         # Calculate DP
@@ -165,6 +167,11 @@ def calculate_risk_direct(gdf_chunk, param):
 
     return gdf_chunk
 
+# Method that calculates risk for all plots
+# (string) inputs: Path where inputs files should be located
+# (array) years: Array of ints with all years that should be processed
+# (array) types_analysis: Array of strings with the types of
+# (int) dst_crs: New system CRS of destination
 def risk_direct(inputs, years, types_analysis, dst_crs):
     in_dis_root = os.path.join(inputs,"plot","fixed","dis")
     # Create output folder
@@ -209,6 +216,76 @@ def risk_direct(inputs, years, types_analysis, dst_crs):
             print("Saving: " + output_file)
             shp_dis.to_file(output_file)
 
+# Method that calculates
+def total_risk_plot(plots, mobilization, risk_plots, type_plot):    
+    for index, row in plots.iterrows(): # Iterate over the chunk        
+        mb = mobilization[mobilization["type_destination"] == type_plot]
+        # Filter the plots which send data to current plot type_destination
+        p_in = mb.loc[mb["id_destination"] == row.ext_id,"id_source"].unique()
+        risk_in = risk_plots.loc[risk_plots["ext_id"].isin(p_in), "rd"].mean()
+        # Filter the plots which receive data from current plot
+        p_out = mb.loc[mb["id_source"] == row.ext_id,"id_destination"].unique()
+        risk_out = risk_plots.loc[risk_plots["ext_id"].isin(p_out), "rd"].mean()
+        if math.isnan(risk_in):
+            risk_in = 0
+        if math.isnan(risk_out):
+            risk_out = 0
+        rd = row.rd
+        if math.isnan(rd):
+            rd = 0
+        plots.at[index,'ri'] = risk_in
+        plots.at[index,'ro'] = risk_out
+        #print("in "+ str(risk_in) + " out " + str(risk_out) + " rd " + str(row.rd))
+        plots.at[index,'rt'] = math.ceil((rd * 0.5) + (risk_in * 0.4) + (risk_out * 0.1 ))
+    return plots
+
+def total_risk(inputs, years, types_analysis, type_plot):
+    in_mob_root = os.path.join(inputs,"mob","fixed")
+    in_risk_root = os.path.join(inputs,"plot","fixed","risk")
+    # Create output folder
+    outputs_folder = os.path.join(inputs,"plot","fixed","total")
+    if not os.path.exists(outputs_folder):
+        os.mkdir(outputs_folder)
+    
+    # CPUS to use
+    cpus = mp.cpu_count() - 1 
+    pool = mp.Pool(processes=cpus)
+
+    # Loop for type of analysis, they can be detail or summary
+    for ta in types_analysis:
+        print("Processing type: " + ta)
+        
+        # Loop for years which want to be analyzed
+        for y in years:    
+            print("Processing year: " + str(y))
+
+            file_shp = os.path.join(in_risk_root,ta,str(y),"rd.shp")
+            print("Opening areas shp: " + file_shp)    
+            shp = gpd.read_file(file_shp)
+
+            file_csv = os.path.join(in_mob_root,str(y) + ".csv")
+            print("Opening mobilization: " + file_csv)    
+            df = pd.read_csv(file_csv, encoding = "ISO-8859-1")
+
+            risk_plots = shp[["ext_id","rd"]]
+
+            print("Starting process parallel")
+            shp_chunks = np.array_split(shp, cpus)            
+            chunk_processes = [pool.apply_async(total_risk_plot, args=(chunk,df, risk_plots, type_plot)) for chunk in shp_chunks]
+            shp_results = [chunk.get() for chunk in chunk_processes]
+            print("Joining results")
+            shp = gpd.GeoDataFrame(pd.concat(shp_results), crs=shp.crs)
+
+            f_folder = os.path.join(outputs_folder, ta)
+            if not os.path.exists(f_folder):
+                os.mkdir(f_folder)
+                        
+            f_folder = os.path.join(f_folder, str(y))
+            if not os.path.exists(f_folder):
+                os.mkdir(f_folder)
+            output_file = os.path.join(f_folder, "total.shp")
+            print("Saving: " + output_file)
+            shp.to_file(output_file)
 
 
 

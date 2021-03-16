@@ -28,6 +28,11 @@ def fixed_data(inputs, columns_rm, c_origin, c_destination, c_type):
         print("Summarizing mobilization")
         df['total'] = df.loc[:,df.columns.drop(columns_exclude)].sum(axis=1)
 
+        print("Fixing columns names")
+        df=df.rename(columns = {c_origin:'id_source'})
+        df=df.rename(columns = {c_destination:'id_destination'})
+        df=df.rename(columns = {c_type:'type_destination'})
+
         fl_paths = file.split(os.path.sep)
         output_file = os.path.join(outputs_folder, fl_paths[len(fl_paths)-1])
         print("Saving: " + output_file)
