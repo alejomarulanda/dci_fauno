@@ -231,12 +231,13 @@ def total_risk_plot(plots, mobilization, risk_plots, type_plot):
         if math.isnan(risk_out):
             risk_out = 0
         rd = row.rd
-        if math.isnan(rd):
-            rd = 0
+        #if math.isnan(rd):
+        #    rd = 0
+        rt_real = (rd * 0.5) + (risk_in * 0.4) + (risk_out * 0.1 )
         plots.at[index,'ri'] = risk_in
         plots.at[index,'ro'] = risk_out
-        #print("in "+ str(risk_in) + " out " + str(risk_out) + " rd " + str(row.rd))
-        plots.at[index,'rt'] = math.ceil((rd * 0.5) + (risk_in * 0.4) + (risk_out * 0.1 ))
+        plots.at[index,'rt_real'] = rt_real
+        plots.at[index,'rt'] = math.ceil(rt_real)
     return plots
 
 def total_risk(inputs, years, types_analysis, type_plot):
@@ -248,7 +249,7 @@ def total_risk(inputs, years, types_analysis, type_plot):
         os.mkdir(outputs_folder)
     
     # CPUS to use
-    cpus = mp.cpu_count() - 1 
+    cpus = mp.cpu_count() - 2 
     pool = mp.Pool(processes=cpus)
 
     # Loop for type of analysis, they can be detail or summary
