@@ -82,3 +82,15 @@ class LocalityNetwork(Document):
     source = ReferenceField(Locality)
     destination = ReferenceField(Locality)
     mobilization = ListField(EmbeddedDocumentField(Animals))
+
+class User(Document):    
+    public_id = StringField(required=True)
+    name = StringField(required=True)
+    password = StringField(required=True)
+    admin = BooleanField(required=True)
+
+class Log(Document):
+    user = StringField()
+    date = DateTimeField(required=True)
+    action = StringField(required=True)
+    comments = StringField(required=True)
