@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Menu from '../menu/Menu';
-import Footer from '../footer/Footer';
+import Menu from '../../components/menu/Menu';
+import Footer from '../../components/footer/Footer';
 
-class Home extends Component {
+class About extends Component {
 
 	render() {
 
@@ -11,7 +11,7 @@ class Home extends Component {
 			<>
 				<Menu />
 				<div className="container-fluid">
-					<h1 className="text-center">Home</h1>
+					<h1 className="text-center">Acerca de</h1>
 					<section className="row">
 						<article className="col-md-8">
 
@@ -27,4 +27,4 @@ class Home extends Component {
 
 }
 
-export default Home;
+export default About;

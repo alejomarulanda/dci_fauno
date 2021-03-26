@@ -2,6 +2,8 @@
 /data/risk_calculator/inputs
 /data/risk_calculator/outputs
 /data/risk_calculator/logs
+/data/geoserver/
+/data/fauno_db/
 
 # Python
 */__pycache__
@@ -14,3 +16,6 @@
 
 # Secrets
 /src/service/app.py
+
+# Test
+/src/service/test.py

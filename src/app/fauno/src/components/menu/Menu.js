@@ -16,12 +16,19 @@ class Menu extends Component {
                             <a className="nav-link" href="#">Home</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#/veredas">Análisis de veredas</a>
+                            <a className="nav-link" href="#/nacional">Análisis nacional</a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link" href="#/acercade">Acerca de</a>
                         </li>
                     </ul>
+                    <div className="d-flex">
+                        <ul className="navbar-nav mr-auto">
+                            <li className="nav-item">
+                                <a className="nav-link" href="#/login">Iniciar sesión</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </nav>
         );

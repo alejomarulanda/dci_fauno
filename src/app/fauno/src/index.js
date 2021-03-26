@@ -6,9 +6,10 @@ import reportWebVitals from './reportWebVitals';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import Home from './components/home/Home';
-import About from './components/about/About';
-import Locality from './components/locality/Locality';
+import Home from './pages/home/Home';
+import About from './pages/about/About';
+import Login from './pages/login/Login';
+import Locality from './pages/locality/Locality';
 
 
 ReactDOM.render(
@@ -17,7 +18,8 @@ ReactDOM.render(
 	    	<Switch>
 		        {/* Pages */}
 		        <Route exact path='/' component={Home} />
-		        <Route path='/veredas' component={Locality} />
+				<Route path='/login' component={Login} />
+		        <Route path='/nacional' component={Locality} />
             	<Route path='/acercade' component={About} />
 	      	</Switch>
 	    </div>
