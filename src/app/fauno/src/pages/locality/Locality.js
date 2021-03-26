@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Menu from '../../components/menu/Menu';
-import Footer from '../../components/footer/Footer';
 import Periods from '../../components/periods/Periods';
 import SelectPlace from './select_place/SelectPlace';
 import Map from './map/Map';
@@ -44,7 +42,6 @@ function Locality() {
 
     return (
         <>
-            <Menu />
             <div className="container-fluid">
                 <h1 className="text-center">Análisis nacional</h1>
                 <p className="text-justify">
@@ -67,7 +64,6 @@ function Locality() {
                     </article>
                 </section>
             </div>
-            <Footer />
         </>
     )
 

@@ -5,9 +5,6 @@ import CheckButton from "react-validation/build/button";
 import { Redirect } from 'react-router-dom';
 import { isEmail } from "validator";
 
-import Menu from '../../components/menu/Menu';
-import Footer from '../../components/footer/Footer';
-
 import AuthUser from "../../services/AuthUser";
 
 import './Login.css';
@@ -66,7 +63,6 @@ function Login() {
 
     return (
         <>
-            <Menu />
             <main className="form-signin">
                 <Form ref={c => { setForm(c); }} onSubmit={handleLogin} >
                     <h1 className="h3 mb-3 fw-normal text-center">Iniciar sesión</h1>
@@ -96,7 +92,6 @@ function Login() {
                     <CheckButton style={{ display: "none" }} ref={c => { setChkButton(c); }} />
                 </Form>
             </main>
-            <Footer />
         </>
     )
 

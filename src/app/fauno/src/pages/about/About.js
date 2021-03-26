@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
-import Menu from '../../components/menu/Menu';
-import Footer from '../../components/footer/Footer';
 
 class About extends Component {
 
 	render() {
-
 		return (
-
-			<>
-				<Menu />
+			<>	
 				<div className="container-fluid">
 					<h1 className="text-center">Acerca de</h1>
 					<section className="row">
@@ -18,9 +13,7 @@ class About extends Component {
 						</article>
 					</section>
 				</div>
-				<Footer />
 			</>
-
 		)
 
 	}
