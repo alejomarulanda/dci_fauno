@@ -15,6 +15,8 @@ def fixed_data(inputs, columns_rm, c_origin, c_destination, c_type):
     for file in files:
         print("Processing: " + file)
         df = pd.read_csv(file, encoding = "ISO-8859-1")
+        df["SIT_ORIGEN"] = df["SIT_ORIGEN"].astype(str).str.split('.', expand = True)[0]
+        df["SIT_DESTINO"] = df["SIT_DESTINO"].astype(str).str.split('.', expand = True)[0]
         print("Removing columns")
         for c in columns_rm:
             if c in df.columns:        

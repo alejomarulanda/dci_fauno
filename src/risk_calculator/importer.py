@@ -113,6 +113,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             mob_net.to_csv(loc_file, index = False, encoding = "ISO-8859-1")
 
             print("Calculating centralities indicators")
+            print(mob_net.head())
             G = nx.from_pandas_edgelist(mob_net, 'adm3_source', 'adm3_destination', edge_attr='total', create_using=nx.DiGraph())
             print("Calculating degree")
             g_c_d = nx.degree_centrality(G)

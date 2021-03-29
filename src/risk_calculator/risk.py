@@ -267,6 +267,8 @@ def total_risk(inputs, years, types_analysis, type_plot):
             file_csv = os.path.join(in_mob_root,str(y) + ".csv")
             print("Opening mobilization: " + file_csv)    
             df = pd.read_csv(file_csv, encoding = "ISO-8859-1")
+            df["SIT_ORIGEN"] = df["SIT_ORIGEN"].astype(str).str.split('.', expand = True)[0]
+            df["SIT_DESTINO"] = df["SIT_DESTINO"].astype(str).str.split('.', expand = True)[0]
 
             risk_plots = shp[["ext_id","rd"]]
 

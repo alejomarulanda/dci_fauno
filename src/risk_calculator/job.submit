@@ -1,0 +1,10 @@
+universe = docker
+docker_image = dapaciat/python:3.9-buster
+executable = /usr/local/bin/python
+arguments = /dapadfs/workspace_cluster_9/Aichi13/BID/risk_calculator/script/run.py
+when_to_transfer_output = ON_EXIT
+output = $(Cluster)_out.txt
+error = $(Cluster)_err.txt
+log = $(Cluster)_log.txt
+request_cpus = 32
+queue
