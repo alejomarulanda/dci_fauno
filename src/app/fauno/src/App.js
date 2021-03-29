@@ -9,6 +9,7 @@ import About from './pages/about/About';
 import Login from './pages/login/Login';
 import User from './pages/user/User';
 import Locality from './pages/locality/Locality';
+import Plot from './pages/plot/Plot';
 
 import './App.css';
 
@@ -26,6 +27,7 @@ class App extends Component {
               <Route path='/usuario' component={User} />
               <Route path='/nacional' component={Locality} />
               <Route path='/acercade' component={About} />
+              <Route path='/individual' component={Plot} />
             </Switch>
           </div>
         </Router>

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Authorize from '../../components/authorize/Authorize';
 
 import AuthUser from "../../services/AuthUser";
 
@@ -12,4 +13,4 @@ function User() {
 
 }
 
-export default User;
+export default Authorize(User);

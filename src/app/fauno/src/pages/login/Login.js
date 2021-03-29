@@ -45,9 +45,9 @@ function Login() {
         if (chkBtn.context._errors.length === 0) {            
             AuthUser.login(email, password).then(
                 () => {
-                    //this.history.push("/");
+                    //push("/user");
                     //window.location.reload();
-                    return <Redirect to='/' />
+                    return <Redirect to='/usuario' />
                 },
                 error => {
                     const resMessage = (error.response && error.response.data && error.response.data.message) ||
