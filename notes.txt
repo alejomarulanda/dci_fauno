@@ -9,3 +9,44 @@ pip install shapely
 pip install geopandas
 pip install rasterio
 pip install rasterstats
+pip install networkx
+pip install multiprocessing
+
+https://github.com/tqdm/tqdm/issues/484
+
+##########################################################
+
+Service
+
+pip install flask
+pip install flask-rest-api
+pip install PyJWT
+pip install requests
+pip install mongoengine
+
+docker pull mongo:4.2
+docker run --name fauno_db -p 27017:27017 -v D:/CIAT/Code/BID/dci_fauno/data/fauno_db/data:/data/db -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=secret -e MONGO_INITDB_DATABASE=fauno_db -d mongo:4.2
+
+##########################################################
+
+Inside that directory, you can run several commands:
+
+  npm start
+    Starts the development server.
+
+  npm run build
+    Bundles the app into static files for production.
+
+  npm test
+    Starts the test runner.
+
+  npm run eject
+    Removes this tool and copies build dependencies, configuration files
+    and scripts into the app directory. If you do this, you can’t go back!
+
+We suggest that you begin by typing:
+
+  cd fauno
+  npm start
+
+Happy hacking!
