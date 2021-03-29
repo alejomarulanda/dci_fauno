@@ -27,7 +27,7 @@ class App extends Component {
               <Route path='/usuario' component={User} />
               <Route path='/nacional' component={Locality} />
               <Route path='/acercade' component={About} />
-              <Route path='/individual' component={Plot} />
+              <Route path='/productor' component={Plot} />
             </Switch>
           </div>
         </Router>

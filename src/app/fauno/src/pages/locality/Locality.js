@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Periods from '../../components/periods/Periods';
 import SelectPlace from './select_place/SelectPlace';
-import Map from './map/Map';
+import Map from '../../components/map/Map';
 import * as d3 from 'd3';
 
 //class Locality extends Component {
@@ -57,7 +57,7 @@ function Locality() {
                     <article className="col-md-6">
                         <SelectPlace title="Departamentos" options={adm_list} onChange={handleChangeAdm}/>
                         <Periods periods={periods} />
-                        <Map center={map_country.center} zoom={map_country.zoom} data={map_country_geodata} />
+                        <Map center={map_country.center} zoom={map_country.zoom} geojson={map_country_geodata} />
                     </article>
                     <article className="col-md-6">
 

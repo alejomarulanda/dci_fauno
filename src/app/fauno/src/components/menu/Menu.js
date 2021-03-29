@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import { NavLink, withRouter } from "react-router-dom";
-
-import Authorize from '../authorize/Authorize';
 
 import AuthUser from '../../services/AuthUser';
 
@@ -26,15 +23,12 @@ const Menu = ({ history }) =>  {
                 <span className="navbar-toggler-icon"></span>
             </button>
             <div className="collapse navbar-collapse" id="navbarCollapse">
-                <ul className="navbar-nav mr-auto">
-                    <li className="nav-item">
-                        <a className="nav-link" href="#">Home</a>
-                    </li>
+                <ul className="navbar-nav mr-auto">                   
                     <li className="nav-item">
                         <a className="nav-link" href="#/nacional">Análisis nacional</a>
                     </li>                    
                     <li className="nav-item">
-                        <a className="nav-link" href="#/individual">Análisis individual</a>
+                        <a className="nav-link" href="#/productor">Análisis productor</a>
                     </li>
                     <li className="nav-item">
                         <a className="nav-link" href="#/acercade">Acerca de</a>
