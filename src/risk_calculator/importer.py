@@ -6,6 +6,11 @@ import pandas as pd
 import math
 import networkx as nx
 
+sys.path.insert(1, "D:\\CIAT\\Code\\BID\\dci_fauno\\src\\orm")
+from mongoengine import *
+from fauno_entities import *
+import datetime
+
 
 def extract_master_data(data, fields, file):
     print("Extracting administrative levels")
@@ -43,6 +48,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             file_shp = os.path.join(in_risk,ta,str(y),"total.shp")
             print("Opening areas shp: " + file_shp)
             shp = gpd.read_file(file_shp)
+            shp["ext_id"] = shp["ext_id"].astype(str).str.split('.', expand = True)[0]
 
             # Administrative level
             extract_master_data(shp, ["adm1_id","adm2_id","adm2_name"], os.path.join(outputs,"administrative_level.csv"))
@@ -72,10 +78,9 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             file_mob = os.path.join(in_mob,str(y) + ".csv")
             print("Opening mobilization: " + file_mob)    
             df_mob = pd.read_csv(file_mob, encoding = "ISO-8859-1")
+            df_mob["id_source"] = df_mob["id_source"].astype(str).str.split('.', expand = True)[0]
+            df_mob["id_destination"] = df_mob["id_destination"].astype(str).str.split('.', expand = True)[0]
             df_mob = df_mob[df_mob["type_destination"] == type_plot]
-            types_col = dict(shp.dtypes)
-            df_mob["id_source"] = df_mob["id_source"].astype(types_col["ext_id"])
-            df_mob["id_destination"] = df_mob["id_destination"].astype(types_col["ext_id"])
 
             print("Merging localities source")
             df_mob = pd.merge(df_mob, shp[["ext_id","adm3_id"]], left_on="id_source", right_on='ext_id', how='left')
@@ -134,7 +139,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             g_indicators = g_indicators.append(g_indicators_tmp, ignore_index=True)
 
             g_indicators_tmp = pd.DataFrame(g_c_d_in.items())
-            g_indicators_tmp.columns = ["exadm3_idt_id","cdi"]
+            g_indicators_tmp.columns = ["adm3_id","cdi"]
             g_indicators = pd.merge(g_indicators, g_indicators_tmp, left_on = "adm3_id",right_on="adm3_id",how='inner')
 
             g_indicators_tmp = pd.DataFrame(g_c_c.items())
@@ -151,7 +156,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
 
             print("Pivoting localities risk")
             loc_col = ["rt","animals","area","def_area"]
-            loc_risk = pd.pivot_table(df_ct, values=loc_col, index=["adm3_id"], aggfunc=[np.sum, np.mean, np.count],fill_value=0.0)
+            loc_risk = pd.pivot_table(df_ct, values=loc_col, index=["adm3_id"], aggfunc=[np.sum, np.mean],fill_value=0.0)
             loc_risk.reset_index(inplace=True)
 
             print("Merging with centrality indicators")
@@ -161,32 +166,35 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             print("Saving: " + loc_r_file)
             l_r.to_csv(loc_r_file, index = False, encoding = "ISO-8859-1")
 
+def save_database(outputs):
+    log_folder = os.path.join(outputs,"log")
+    # Create output folder    
+    if not os.path.exists(log_folder):
+        os.mkdir(log_folder)
 
+    date = datetime.datetime.now()
+    
+    # Administrative level
+    adm_file = os.path.join(outputs,"administrative_level.csv")
+    print("Reading: " + adm_file)
+    df_adm = pd.read_csv(adm_file, encoding = "ISO-8859-1")
+    df_adm["id"] = ""
+    print("Importing")
+    for index, row in df_adm.iterrows():
+        adm = AdministrativeLevel(name = row['adm2_name'], adm = row['adm1_id'], ext_id = row['adm2_id'], enable = True, created = date, updated = date)
+        adm.save()
+        row["id"] = adm.id
+    
+    # Locality
+    loc_file = os.path.join(outputs,"localities.csv")
+    print("Reading: " + loc_file)
+    df_loc = pd.read_csv(loc_file, encoding = "ISO-8859-1")
+    df_loc["id"] = ""
+    print("Importing")
+    for index, row in df_loc.iterrows():
+        loc = Locality(name = row['adm2_name'], adm = row['adm1_id'], ext_id = row['adm2_id'], enable = True, created = date, updated = date)
+        loc.save()
+        row["id"] = loc.id
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
-            
-            
-
-
-
-
-
-           
-
-
-
-            

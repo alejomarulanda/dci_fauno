@@ -91,6 +91,7 @@ def distance_plot(inputs, years, types_analysis):
     
     # CPUS to use
     cpus = mp.cpu_count() - 1 
+    print("CPUs: " + str(cpus))
     pool = mp.Pool(processes=cpus)
 
     # Loop for type of analysis, they can be detail or summary
@@ -182,6 +183,7 @@ def risk_direct(inputs, years, types_analysis, dst_crs):
     # CPUS to use
     cpus = mp.cpu_count() - 1 
     pool = mp.Pool(processes=cpus)
+    print("CPUs: " + str(cpus))
 
     # Loop for type of analysis, they can be detail or summary
     for ta in types_analysis:
@@ -221,18 +223,16 @@ def total_risk_plot(plots, mobilization, risk_plots, type_plot):
     for index, row in plots.iterrows(): # Iterate over the chunk        
         mb = mobilization[mobilization["type_destination"] == type_plot]
         # Filter the plots which send data to current plot type_destination
-        p_in = mb.loc[mb["id_destination"] == row.ext_id,"id_source"].unique()
+        p_in = mb.loc[mb["id_destination"] == str(row.ext_id),"id_source"].unique()
         risk_in = risk_plots.loc[risk_plots["ext_id"].isin(p_in), "rd"].mean()
         # Filter the plots which receive data from current plot
-        p_out = mb.loc[mb["id_source"] == row.ext_id,"id_destination"].unique()
+        p_out = mb.loc[mb["id_source"] == str(row.ext_id),"id_destination"].unique()
         risk_out = risk_plots.loc[risk_plots["ext_id"].isin(p_out), "rd"].mean()
         if math.isnan(risk_in):
             risk_in = 0
         if math.isnan(risk_out):
             risk_out = 0
         rd = row.rd
-        #if math.isnan(rd):
-        #    rd = 0
         rt_real = (rd * 0.5) + (risk_in * 0.4) + (risk_out * 0.1 )
         plots.at[index,'ri'] = risk_in
         plots.at[index,'ro'] = risk_out
@@ -251,6 +251,7 @@ def total_risk(inputs, years, types_analysis, type_plot):
     # CPUS to use
     cpus = mp.cpu_count() - 2 
     pool = mp.Pool(processes=cpus)
+    print("CPUs: " + str(cpus))
 
     # Loop for type of analysis, they can be detail or summary
     for ta in types_analysis:
@@ -267,8 +268,8 @@ def total_risk(inputs, years, types_analysis, type_plot):
             file_csv = os.path.join(in_mob_root,str(y) + ".csv")
             print("Opening mobilization: " + file_csv)    
             df = pd.read_csv(file_csv, encoding = "ISO-8859-1")
-            df["SIT_ORIGEN"] = df["SIT_ORIGEN"].astype(str).str.split('.', expand = True)[0]
-            df["SIT_DESTINO"] = df["SIT_DESTINO"].astype(str).str.split('.', expand = True)[0]
+            df["id_source"] = df["id_source"].astype(str).str.split('.', expand = True)[0]
+            df["id_destination"] = df["id_destination"].astype(str).str.split('.', expand = True)[0]
 
             risk_plots = shp[["ext_id","rd"]]
 

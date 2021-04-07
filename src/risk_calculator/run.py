@@ -3,7 +3,9 @@ import os
 import glob
 import pandas as pd
 
-sys.path.insert(1, "/dapadfs/workspace_cluster_9/Aichi13/BID/risk_calculator/script/")
+os.environ['GDAL_DATA'] = '/usr/local/lib/python3.9/site-packages/fiona/gdal_data/'
+os.chdir('/dapadfs/workspace_cluster_9/Aichi13/BID/risk_calculator/script')
+#sys.path.insert(1, "/dapadfs/workspace_cluster_9/Aichi13/BID/risk_calculator/script/")
 
 # Import modules
 import deforestation as defo
@@ -60,6 +62,6 @@ ris_years = map(str.strip, conf.loc[conf["parameter"] == "ris_years","value"].va
 ris_types_analysis =  map(str.strip, conf.loc[conf["parameter"] == "ris_types_analysis","value"].values[0].split(","))
 ris_type_plot = conf.loc[conf["parameter"] == "ris_type_plot","value"].values[0]
 
-#impo.generate_outputs(inputs, outputs, ris_years, ris_types_analysis, ris_type_plot)
-impo.generate_outputs(inputs, outputs, ["2017","2018"], ris_types_analysis, ris_type_plot)
+#risk.total_risk(inputs, ris_years, ris_types_analysis)
+risk.total_risk(inputs, ["2017","2018"], ris_types_analysis, ris_type_plot)
 print("Done!")
