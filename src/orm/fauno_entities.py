@@ -23,18 +23,17 @@ class CattleRancher(Document):
     created = DateTimeField(required=True)
     updated = DateTimeField(required=True)
 
-class Analysis(Document):
-    locality = ReferenceField(Locality)
+class Analysis(Document):    
     year_start = IntField(required=True)
     year_end = IntField(required=True)
     type_analysis = StringField(required=True)
-    version = IntField(required=True)
 
 class CattleRancherRisk(Document):
     cattle_rancher = ReferenceField(CattleRancher)
     analysis = ReferenceField(Analysis)
-    latitud = FloatField(required=True)
-    longitud = FloatField(required=True)
+    lat = FloatField(required=True)
+    lon = FloatField(required=True)
+    geojson = StringField(required=True)
     # Risk
     def_prop = FloatField(required=True)
     def_distance_m = FloatField(required=True)
@@ -46,7 +45,6 @@ class CattleRancherRisk(Document):
     # Parameters
     animals_amount = LongField(required=True)
     buffer_size = FloatField(required=True)
-    buffer_radio = FloatField(required=True)
     field_capacity = FloatField(required=True)
     def_ha = FloatField(required=True)
     def_distance = FloatField(required=True)
@@ -60,6 +58,7 @@ class CattleRancherNetwork(Document):
     source = ReferenceField(CattleRancher)
     destination = ReferenceField(CattleRancher)
     mobilization = ListField(EmbeddedDocumentField(Animals))
+    total = IntField(required=True)
 
 class LocalityRisk(Document):
     locality = ReferenceField(Locality)
