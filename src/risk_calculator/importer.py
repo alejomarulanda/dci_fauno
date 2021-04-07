@@ -5,12 +5,15 @@ import numpy as np
 import pandas as pd
 import math
 import networkx as nx
-
+import sys
 sys.path.insert(1, "D:\\CIAT\\Code\\BID\\dci_fauno\\src\\orm")
 from mongoengine import *
 from fauno_entities import *
 import datetime
 
+def print_progress(shape,current):
+    done = int(50 * current / shape)
+    print("[%s%s]" % ('=' * done, ' ' * (50-done)), end="\r", flush=True )
 
 def extract_master_data(data, fields, file):
     print("Extracting administrative levels")
@@ -84,7 +87,6 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
 
             print("Merging localities source")
             df_mob = pd.merge(df_mob, shp[["ext_id","adm3_id"]], left_on="id_source", right_on='ext_id', how='left')
-            print(df_mob.head())
             df_mob = df_mob.rename(columns={"adm3_id":"adm3_source"})    
             df_mob = df_mob.drop(columns=["ext_id"], axis=0)
             print("Merging localities destination")
@@ -101,7 +103,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             ctm_log = os.path.join(out_mob_log,"cattle_rancher_network.csv") 
             print("Saving: " + ctm_file)
             print("Shape: " + str(new_mob.shape))
-            new_mob.to_csv(ct_file, index = False, encoding = "ISO-8859-1")
+            new_mob.to_csv(ctm_file, index = False, encoding = "ISO-8859-1")
             print("Saving:" + ctm_log)
             print("Shape: " + str(mob_bad.shape))
             mob_bad.to_csv(ctm_log, index = False, encoding = "ISO-8859-1")
@@ -142,8 +144,8 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             g_indicators_tmp.columns = ["adm3_id","cdi"]
             g_indicators = pd.merge(g_indicators, g_indicators_tmp, left_on = "adm3_id",right_on="adm3_id",how='inner')
 
-            g_indicators_tmp = pd.DataFrame(g_c_c.items())
-            g_indicators_tmp.columns = ["adm3_id","cc"]
+            g_indicators_tmp = pd.DataFrame(g_c_d_out.items())
+            g_indicators_tmp.columns = ["adm3_id","cdo"]
             g_indicators = pd.merge(g_indicators, g_indicators_tmp, left_on = "adm3_id",right_on="adm3_id",how='inner')
 
             g_indicators_tmp = pd.DataFrame(g_c_c.items())
@@ -156,7 +158,9 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
 
             print("Pivoting localities risk")
             loc_col = ["rt","animals","area","def_area"]
+            print(df_ct.head())
             loc_risk = pd.pivot_table(df_ct, values=loc_col, index=["adm3_id"], aggfunc=[np.sum, np.mean],fill_value=0.0)
+            print(loc_risk.head())
             loc_risk.reset_index(inplace=True)
 
             print("Merging with centrality indicators")
@@ -166,35 +170,153 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             print("Saving: " + loc_r_file)
             l_r.to_csv(loc_r_file, index = False, encoding = "ISO-8859-1")
 
-def save_database(outputs):
+def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_server, db_port):
     log_folder = os.path.join(outputs,"log")
     # Create output folder    
     if not os.path.exists(log_folder):
         os.mkdir(log_folder)
 
     date = datetime.datetime.now()
+    connect(db_name,username=db_user, password=db_pwd, authentication_source='admin', host=db_server, port=db_port)
     
     # Administrative level
     adm_file = os.path.join(outputs,"administrative_level.csv")
     print("Reading: " + adm_file)
     df_adm = pd.read_csv(adm_file, encoding = "ISO-8859-1")
+    df_adm["adm1_id"] = df_adm["adm1_id"].astype(str)
+    df_adm["adm2_id"] = df_adm["adm2_id"].astype(str)
     df_adm["id"] = ""
-    print("Importing")
+    print("Importing: " + str(df_adm.shape[0]))
     for index, row in df_adm.iterrows():
         adm = AdministrativeLevel(name = row['adm2_name'], adm = row['adm1_id'], ext_id = row['adm2_id'], enable = True, created = date, updated = date)
         adm.save()
         row["id"] = adm.id
+        print_progress(df_adm.shape[0],index)
     
     # Locality
     loc_file = os.path.join(outputs,"localities.csv")
     print("Reading: " + loc_file)
     df_loc = pd.read_csv(loc_file, encoding = "ISO-8859-1")
+    df_loc["adm2_id"] = df_loc["adm2_id"].astype(str)
+    df_loc["adm3_id"] = df_loc["adm3_id"].astype(str)
+    print("Merging with administrative level")
+    df_loc = pd.merge(df_loc, df_adm[["id","adm2_id"]], left_on="adm2_id", right_on='adm2_id', how='inner')
+    df_loc = df_loc.rename(columns={"id":"adm_id"})    
     df_loc["id"] = ""
-    print("Importing")
+    print("Importing: " + str(df_loc.shape[0]))
     for index, row in df_loc.iterrows():
-        loc = Locality(name = row['adm2_name'], adm = row['adm1_id'], ext_id = row['adm2_id'], enable = True, created = date, updated = date)
+        loc = Locality(adm_level = row['adm_id'], name = row['adm3_name'], ext_id = row['adm3_id'], enable = True, created = date, updated = date)
         loc.save()
         row["id"] = loc.id
+        print_progress(df_loc.shape[0],index)
+    
+    # Cattle Rancher
+    ran_file = os.path.join(outputs,"cattle_rancher.csv")
+    print("Reading: " + ran_file)
+    df_ran = pd.read_csv(ran_file, encoding = "ISO-8859-1")
+    df_ran["adm3_id"] = df_ran["adm3_id"].astype(str)
+    df_ran["ext_id"] = df_ran["ext_id"].astype(str)
+    print("Merging with localities")
+    df_ran = pd.merge(df_ran, df_loc[["id","adm3_id"]], left_on="adm3_id", right_on='adm3_id', how='inner')
+    df_ran = df_ran.rename(columns={"id":"adm_id"})    
+    df_ran["id"] = ""
+    print("Importing: " + str(df_ran.shape[0]))
+    for index, row in df_ran.iterrows():
+        ran = CattleRancher(locality = row['adm_id'], ext_id = row['ext_id'], enable = True, created = date, updated = date)
+        ran.save()
+        row["id"] = ran.id
+        print_progress(df_ran.shape[0],index)
+        
+    
+    # Analysis
+    for y in years:
+        for ta in type_analysis:
+            print("Starting analysis: " + str(y) + "-" + ta)
+            analysis = Analysis(year_start = int(y), year_end = int(y), type_analysis = ta)
+            analysis.save()
+
+            # Risk Cattle Rancher
+            print("Cattle Rancher Risk")
+            ct_file = os.path.join(outputs,ta,str(y),"cattle_rancher_risk.csv")
+            print("Reading: " + ct_file)
+            df_ctr = pd.read_csv(ct_file, encoding = "ISO-8859-1")            
+            df_ctr["ext_id"] = df_ctr["ext_id"].astype(str)
+            
+            print("Merging with cattle rancher")            
+            df_ctr = pd.merge(df_ctr, df_ran[["id","ext_id"]], left_on="ext_id", right_on='ext_id', how='inner')            
+            print("Importing: " + str(df_ctr.shape[0]))
+            for index, row in df_ctr.iterrows():                
+                ctr = CattleRancherRisk(cattle_rancher = row['id'], analysis = analysis.id, 
+                                        lat = row['lat'], lon =  row['lon'], geojson = row['geometry'],
+                                        def_prop = row['def_prop'], def_distance_m =  row['distance'], def_distance_prop =  row['dp'],
+                                        risk_direct = row['rd'], risk_input = row['ri'], risk_output = row['ro'], risk_total = row['rt'],
+                                        animals_amount = row['animals'], buffer_size = row['area'], 
+                                        field_capacity = row['field_capa'], def_ha = row['def_area'], 
+                                        def_distance = row['dd'])
+                ctr.save()
+                print_progress(df_ctr.shape[0],index)
+            
+            # Network Cattle Rancher
+            print("Cattle Rancher Network")
+            cn_file = os.path.join(outputs,ta,str(y),"cattle_rancher_network.csv")
+            print("Reading: " + cn_file)
+            df_ctn = pd.read_csv(cn_file,dtype={"id_source": "string", "id_destination": "string"}, encoding = "ISO-8859-1")            
+            #df_ctn["id_source"] = df_ctn["id_source"].astype(str)
+            #df_ctn["id_destination"] = df_ctn["id_destination"].astype(str)
+
+            print("Merging with cattle rancher source")
+            df_ctn = pd.merge(df_ctn, df_ran[["id","ext_id"]], left_on="id_source", right_on='ext_id', how='inner')
+            df_ctn = df_ctn.rename(columns={"id":"source"})
+            print("Shape: " + str(df_ctn.shape[0]))
+            print("Merging with cattle rancher destination")
+            df_ctn = pd.merge(df_ctn, df_ran[["id","ext_id"]], left_on="id_destination", right_on='ext_id', how='inner')
+            df_ctn = df_ctn.rename(columns={"id":"destination"})
+            print("Shape: " + str(df_ctn.shape[0]))
+
+            print("Importing: " + str(df_ctn.shape[0]))
+            cols_animals = df_ctn.columns.drop(["id_source","id_destination","type_destination","total","adm3_source","adm3_destination","source","destination"])
+            for index, row in df_ctn.iterrows():
+                animals = [Animals(label = c, amount = row[c]) for c in cols_animals]
+                ctn = CattleRancherNetwork(source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
+                ctn.save()
+                print_progress(df_ctr.shape[0],index)
+
+            # Localities Network
+            print("Localities Network")
+            ln_file = os.path.join(outputs,ta,str(y),"locality_network.csv")
+            print("Reading: " + ln_file)
+            df_lon = pd.read_csv(ln_file, encoding = "ISO-8859-1")            
+            df_lon["adm3_source"] = df_lon["adm3_source"].astype(str)
+            df_lon["adm3_destination"] = df_lon["adm3_destination"].astype(str)
+
+            print("Merging with cattle rancher source")
+            df_lon = pd.merge(df_lon, df_loc[["id","adm3_id"]], left_on="adm3_source", right_on='adm3_id', how='inner')
+            df_lon = df_lon.rename(columns={"id":"source"})    
+            print("Merging with cattle rancher destination")
+            df_lon = pd.merge(df_lon, df_loc[["id","adm3_id"]], left_on="adm3_destination", right_on='adm3_id', how='inner')
+            df_lon = df_lon.rename(columns={"id":"destination"})
+
+            print("Importing: " + str(df_lon.shape[0]))
+            cols_animals = df_lon.columns.drop(["adm3_source","adm3_destination","type_destination","total","source","destination"])
+            for index, row in df_lon.iterrows():
+                animals = [Animals(label = c, amount = row[c]) for c in cols_animals]
+                lon = LocalityNetwork(source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
+                lon.save()
+
+
+
+            
+                
+
+
+
+
+
+
+
+
+
+    
 
     
 
