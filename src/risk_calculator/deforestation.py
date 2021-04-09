@@ -205,12 +205,13 @@ def summary_deforestation(inputs):
     for idx, rf in enumerate(files):
         print(rf)
         with rio.open(rf) as raster:
+            # Copy medatadata
+            meta_ref = raster.meta.copy()
             # Extract values deforestation
             array = raster.read()    
             # Check if it is the first raster
             if idx == 0:
-                summary = array
-                meta_ref = raster.meta.copy()
+                summary = array            
             # Acummulating data            
             summary = summary + array
         # Clear data for deforestation values
@@ -252,11 +253,8 @@ def to_shp(inputs):
                 results = pd.DataFrame([src.xy(x,y) for x in np.arange(image.shape[1]) for y in np.arange(image.shape[2]) if int(image[0][x][y]) == 2], columns=["lon","lat"])
 
             print("Creating shapefile crs: " + str(crs.data))            
-            #geoms = list(results)    
-            #gdf  = gpd.GeoDataFrame.from_features(geoms,crs = crs.data)
             gdf = gpd.GeoDataFrame(results, geometry=gpd.points_from_xy(results.lon, results.lat),crs = crs.data)
-            #gdf  = gpd.GeoDataFrame.from_features(results,crs = crs.data)
-
+            
             rf_paths = rf.split(os.path.sep)
             # Cretae folder for the shapefile
             f_folder = os.path.join(shp_folder,rf_paths[len(rf_paths) - 1].replace(".tif",""))
@@ -265,8 +263,3 @@ def to_shp(inputs):
             dest_file = os.path.join(f_folder,"shapefile.shp")
             print("Saving: " + dest_file)    
             gdf.to_file(dest_file)
-        
-    
-    
-                    
- 
