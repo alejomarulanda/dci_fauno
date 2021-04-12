@@ -20,20 +20,22 @@ class CattleRancher(Document):
     locality = ReferenceField(Locality)
     ext_id = StringField(required=True)
     enable = BooleanField(required=True)
+    lat = FloatField(required=True)
+    lon = FloatField(required=True)
+    buffer_radio = FloatField(required=True)
     created = DateTimeField(required=True)
     updated = DateTimeField(required=True)
 
 class Analysis(Document):    
     year_start = IntField(required=True)
     year_end = IntField(required=True)
-    type_analysis = StringField(required=True)
+    type_analysis = StringField(required=True)    
 
 class CattleRancherRisk(Document):
     cattle_rancher = ReferenceField(CattleRancher)
     analysis = ReferenceField(Analysis)
     lat = FloatField(required=True)
     lon = FloatField(required=True)
-    geojson = StringField(required=True)
     # Risk
     def_prop = FloatField(required=True)
     def_distance_m = FloatField(required=True)
@@ -45,6 +47,7 @@ class CattleRancherRisk(Document):
     # Parameters
     animals_amount = LongField(required=True)
     buffer_size = FloatField(required=True)
+    buffer_radio = FloatField(required=True)
     field_capacity = FloatField(required=True)
     def_ha = FloatField(required=True)
     def_distance = FloatField(required=True)
