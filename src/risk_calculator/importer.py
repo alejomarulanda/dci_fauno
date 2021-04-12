@@ -15,16 +15,16 @@ def print_progress(shape,current):
     done = int(50 * current / shape)
     print("[%s%s]" % ('=' * done, ' ' * (50-done)), end="\r", flush=True )
 
-def extract_master_data(data, fields, file):
+def extract_master_data(data, fields, file, key):
     print("Extracting administrative levels")
     df = pd.DataFrame()
     # validate if a file exists
     if os.path.exists(file):
         df = pd.read_csv(file, encoding = "ISO-8859-1")
-    df_tmp = data[fields].drop_duplicates()
     # add new records
-    df = df.append(df_tmp, ignore_index=True)
-    df = df.drop_duplicates()
+    df = df.append(data[fields], ignore_index=True)
+    print("Removing duplicates")
+    df = df.drop_duplicates(subset=key, keep='last')
     print("Saving: " + file)
     df.to_csv(file, index = False, encoding = "ISO-8859-1")
 
@@ -52,15 +52,15 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             print("Opening areas shp: " + file_shp)
             shp = gpd.read_file(file_shp)
             shp["ext_id"] = shp["ext_id"].astype(str).str.split('.', expand = True)[0]
-
+            
             # Administrative level
-            extract_master_data(shp, ["adm1_id","adm2_id","adm2_name"], os.path.join(outputs,"administrative_level.csv"))
+            extract_master_data(shp, ["adm1_id","adm2_id","adm2_name"], os.path.join(outputs,"administrative_level.csv"), "adm2_id")
 
             # Localities
-            extract_master_data(shp, ["adm2_id","adm3_id","adm3_name"], os.path.join(outputs,"localities.csv"))
+            extract_master_data(shp, ["adm2_id","adm3_id","adm3_name"], os.path.join(outputs,"localities.csv"), "adm3_id")
             
             # Cattle rancher
-            extract_master_data(shp, ["adm3_id","ext_id"], os.path.join(outputs,"cattle_rancher.csv"))
+            extract_master_data(shp, ["adm3_id","ext_id","lat","lon"], os.path.join(outputs,"cattle_rancher.csv"), "ext_id")
 
             print("Starting analysis")
             outputs_folder = os.path.join(outputs,ta)
@@ -71,7 +71,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
                 os.mkdir(outputs_folder)
             
             print("Processing Cattle Rancher Risk")
-            df_ct = shp[["adm3_id","ext_id","lat","lon","geometry","def_prop","dp","dd","rd","ri","ro","rt","animals","area","field_capa","def_area","distance"]]
+            df_ct = shp[["adm3_id","ext_id","def_prop","dp","dd","rd","ri","ro","rt","animals","area","field_capa","def_area","distance"]]
             ct_file = os.path.join(outputs_folder,"cattle_rancher_risk.csv")
             print("Saving: " + ct_file)
             df_ct.to_csv(ct_file, index = False, encoding = "ISO-8859-1")
@@ -222,7 +222,9 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     df_ran["id"] = ""
     print("Importing: " + str(df_ran.shape[0]))
     for index, row in df_ran.iterrows():
-        ran = CattleRancher(locality = row['adm_id'], ext_id = row['ext_id'], enable = True, created = date, updated = date)
+        ran = CattleRancher(locality = row['adm_id'], ext_id = row['ext_id'], 
+                            lat = row['lat'], lon =  row['lon'], geojson = row['geojson'], 
+                            enable = True, created = date, updated = date)
         ran.save()
         row["id"] = ran.id
         print_progress(df_ran.shape[0],index)
@@ -243,11 +245,11 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             df_ctr["ext_id"] = df_ctr["ext_id"].astype(str)
             
             print("Merging with cattle rancher")            
-            df_ctr = pd.merge(df_ctr, df_ran[["id","ext_id"]], left_on="ext_id", right_on='ext_id', how='inner')            
+            df_ctr = pd.merge(df_ctr, df_ran[["id","ext_id"]], left_on="ext_id", right_on='ext_id', how='inner')                        
             print("Importing: " + str(df_ctr.shape[0]))
             for index, row in df_ctr.iterrows():                
                 ctr = CattleRancherRisk(cattle_rancher = row['id'], analysis = analysis.id, 
-                                        lat = row['lat'], lon =  row['lon'], geojson = row['geometry'],
+                                        buffer_radio = 0,
                                         def_prop = row['def_prop'], def_distance_m =  row['distance'], def_distance_prop =  row['dp'],
                                         risk_direct = row['rd'], risk_input = row['ri'], risk_output = row['ro'], risk_total = row['rt'],
                                         animals_amount = row['animals'], buffer_size = row['area'], 
@@ -260,9 +262,7 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             print("Cattle Rancher Network")
             cn_file = os.path.join(outputs,ta,str(y),"cattle_rancher_network.csv")
             print("Reading: " + cn_file)
-            df_ctn = pd.read_csv(cn_file,dtype={"id_source": "string", "id_destination": "string"}, encoding = "ISO-8859-1")            
-            #df_ctn["id_source"] = df_ctn["id_source"].astype(str)
-            #df_ctn["id_destination"] = df_ctn["id_destination"].astype(str)
+            df_ctn = pd.read_csv(cn_file,dtype={"id_source": "string", "id_destination": "string"}, encoding = "ISO-8859-1")
 
             print("Merging with cattle rancher source")
             df_ctn = pd.merge(df_ctn, df_ran[["id","ext_id"]], left_on="id_source", right_on='ext_id', how='inner')
@@ -274,10 +274,10 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             print("Shape: " + str(df_ctn.shape[0]))
 
             print("Importing: " + str(df_ctn.shape[0]))
-            cols_animals = df_ctn.columns.drop(["id_source","id_destination","type_destination","total","adm3_source","adm3_destination","source","destination"])
+            cols_animals = df_ctn.columns.drop(["id_source","id_destination","type_destination","total","adm3_source","adm3_destination","source","destination","ext_id_x","ext_id_y"])
             for index, row in df_ctn.iterrows():
-                animals = [Animals(label = c, amount = row[c]) for c in cols_animals]
-                ctn = CattleRancherNetwork(source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
+                animals = [Animals(label = c, amount = row[c]) for c in cols_animals if row[c] > 0]
+                ctn = CattleRancherNetwork(analysis = analysis.id,source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
                 ctn.save()
                 print_progress(df_ctr.shape[0],index)
 
@@ -299,8 +299,8 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             print("Importing: " + str(df_lon.shape[0]))
             cols_animals = df_lon.columns.drop(["adm3_source","adm3_destination","type_destination","total","source","destination"])
             for index, row in df_lon.iterrows():
-                animals = [Animals(label = c, amount = row[c]) for c in cols_animals]
-                lon = LocalityNetwork(source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
+                animals = [Animals(label = c, amount = row[c]) for c in cols_animals  if row[c] > 0]
+                lon = LocalityNetwork(analysis = analysis.id, source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
                 lon.save()
 
 

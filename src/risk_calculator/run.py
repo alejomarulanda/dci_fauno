@@ -57,6 +57,18 @@ if not os.path.exists(mob_folder):
 
 print("Done!")
 
+
+##############################################
+
+# Getting parameters for processing data
+ris_years = map(str.strip, conf.loc[conf["parameter"] == "ris_years","value"].values[0].split(","))
+ris_types_analysis =  map(str.strip, conf.loc[conf["parameter"] == "ris_types_analysis","value"].values[0].split(","))
+
+risk.distance_plot(inputs, ris_years, ris_types_analysis)
+print("Done!")
+
+##############################################
+"""
 # Getting parameters for processing data
 ris_years = map(str.strip, conf.loc[conf["parameter"] == "ris_years","value"].values[0].split(","))
 ris_types_analysis =  map(str.strip, conf.loc[conf["parameter"] == "ris_types_analysis","value"].values[0].split(","))
@@ -65,3 +77,4 @@ ris_type_plot = conf.loc[conf["parameter"] == "ris_type_plot","value"].values[0]
 #risk.total_risk(inputs, ris_years, ris_types_analysis)
 risk.total_risk(inputs, ["2017","2018"], ris_types_analysis, ris_type_plot)
 print("Done!")
+"""
