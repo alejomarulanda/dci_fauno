@@ -119,84 +119,99 @@ def get_analysis_periods():
 
     return jsonify({'periods': result})
 
-@app.route('/api/v1/analysis/locality_risk',methods=['GET'])
-def get_analysis_locality_risk():
+@app.route('/api/v1/analysis/locality',methods=['GET'])
+def get_analysis_locality():
+    # Getting list of all plots requeste
+    ids = request.args.get("ids").split(',')
 
-    period = request.args.get("period").split("-")
-    year_start = int(period[0])
-    year_end = int(period[1])
-    type_a = request.args.get("type")
+    # Getting all_localities from databases
+    localities = Locality.objects(ext_id__in = ids)
+    if not localities:
+        return jsonify({'message': "Localities were not found"})
 
-    analysis = Analysis.objects.get(year_start = year_start, year_end = year_end)
+    localities_list = [x.id for x in localities]
+    #plots = CattleRancher.objects(id__in = plots_list)
+    mob = LocalityNetwork.objects(Q(destination__in = localities_list) | Q(source__in = localities_list))
     
-    localities = Locality.objects()
-    adms = AdministrativeLevel.objects()
-    localities_risk = LocalityRisk.objects(analysis = analysis.id)
+    # Search all all_localities data
+    all_localities = localities_list + [x.source.id for x in mob] + [x.destination.id for x in mob]
 
+    risk = LocalityRisk.objects(cattle_rancher__in = all_localities)
     result = []
-    for lr in localities_risk:
-        lr_data = {}
 
-        l = [x for x in localities if x.id is lr.locality][0]
-        a = [x for x in adms if x.id is l.adm_level][0]        
+    for l in localities:
+        l_data = {}
+
+        l_data["locality"] = {'id':str(l.id), 'ext_id':l.ext_id, 'name':l.name }
         
-        #lr_data['locality'] = { id: l.id, name: l.name, ext_id: l.ext_id, 
-        #                        adm_id: a.id, adm_ext_id: a.ext_id, adm_name: a.name, adm_adm:a.adm } 
-        #lr_data['indicators'] = { def_ha: lr.def_ha, cattle_rancher: lr.cattle_rancher_amount, 
-        #                        risk_total: lr.risk_total, 
-        #                        d:lr.degree, d_in : lr.degree_in, d_out:lr.degree_out, b : lr.betweenness, c : lr.closeness }        
-        result.append(lr_data) 
+        l_data["risk"] = [{'year_start':x.analysis.year_start, 'year_end':x.analysis.year_end,
+                            'cr_amount':x.cattle_rancher_amount, 'def_area': x.def_ha, 'rt': x.risk_total,
+                            'degree': x.degree,'degree_in': x.degree_in, 'degree_out': x.degree_out,  
+                            'betweenness':x.betweenness, 'closeness':x.closeness }
+                            for x in risk if x.locality.id == p.id ]
+        
+        l_data["in"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
+                        'source': {'id': str(x.source.id), 'ext_id':x.source.ext_id, 'name':x.source.name},
+                        'total':x.total, 'exchange':[ {"label": y.label, "amount": y.amount } for y in x.mobilization] } 
+                        for x in mob if x.destination.id == p.id]
+        
+        l_data["out"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
+                        'source': {'id': str(x.destination.id), 'ext_id':x.destination.ext_id, 'name':x.destination.name},
+                        'total':x.total, 'exchange':[ {"label": y.label, "amount": y.amount } for y in x.mobilization] } 
+                        for x in mob if x.source.id == p.id]
+        
+        result.append(l_data) 
 
-    return jsonify({'risk': result})
-
-@app.route('/api/v1/analysis/locality_network',methods=['GET'])
-def get_analysis_locality_network():
-
-    period = request.args.get("period").split("-")
-    year_start = int(period[0])
-    year_end = int(period[1])
-    type_a = request.args.get("type")
-    locality = request.args.get("locality")
-
-    analysis = Analysis.objects.get(year_start = year_start, year_end = year_end)
-    
-    localities = Locality.objects()
-    adms = AdministrativeLevel.objects()    
-    network = LocalityNetwork.objects(Q(analysis = analysis.id) & (Q(source = locality) | Q(destination = locality)))
-   
-    #n_out = [{id:x.destination, mobilization:x.mobilization} for x in network if x.source is lr.locality]
-    #n_in = [{id:x.source, mobilization:x.mobilization} for x in network if x.destination is lr.locality]
-    
-    return jsonify({'network': {'in': n_in, 'out': n_out}})
+    return jsonify(result)
 
 @app.route('/api/v1/analysis/plots',methods=['GET'])
-@token_required
+#@token_required
+@cross_origin()
 def get_analysis_plot():
-    ids = request.args.get("plots").split(',')
+    # Getting list of all plots requeste
+    ids = request.args.get("ids").split(',')
 
+    # Getting plots from databases
     plots = CattleRancher.objects(ext_id__in = ids)
     if not plots:
         return jsonify({'message': "plots were not found"})
 
-    all_plots = CattleRancher.objects()
+    plots_list = [x.id for x in plots]
+    #plots = CattleRancher.objects(id__in = plots_list)    
+    mob = CattleRancherNetwork.objects(Q(destination__in = plots_list) | Q(source__in = plots_list))
+    
+    # Search all plots data
+    all_plots = plots_list + [x.source.id for x in mob] + [x.destination.id for x in mob]
 
+    risk = CattleRancherRisk.objects(cattle_rancher__in = all_plots)
     result = []
 
-    #for p in plots:
-    #    p_data = {}
+    # loop just for plots which were asked by user
+    for p in plots:
+        p_data = {}
 
-    #    risk = CattleRancherRisk.objects(cattle_rancher = p.id)
-    #    m_out = CattleRancherNetwork.objects(destination = p.id)
-    #    m_in = CattleRancherNetwork.objects(source = p.id)
+        p_data["plot"] = {'id':str(p.id), 'ext_id':p.ext_id, 'lat': p.lat, 'lon':p.lon, 'buffer_radio':p.buffer_radio}
         
-    #    p_data["plot"] = {id:p.id, ext_id:p.ext_id}
-
-    #    analysis:{ year_start:
-
-    #    }}
-    #    result.append(p_data) 
-
-    return jsonify({'risk': result})
+        p_data["risk"] = [{'year_start':x.analysis.year_start, 'year_end':x.analysis.year_end,
+                            'lat': x.lat, 'lon':x.lon, 
+                            'animals':x.animals_amount, 'buffer_radio':x.buffer_radio, 'buffer_size':x.buffer_size,
+                            'def_prop_area': x.def_prop, 'def_prop_distance': x.def_distance_prop,'def_area': x.def_ha, 'def_dist': x.def_distance,  
+                            'rt': x.risk_total, 'rd':x.risk_direct, 'ri':x.risk_input, 'ro':x.risk_output  }
+                            for x in risk if x.cattle_rancher.id == p.id ]
+        
+        p_data["in"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
+                        'source': {'id': str(x.source.id), 'ext_id':x.source.ext_id, 'lat': x.source.lat, 'lon':x.source.lon, 'buffer_radio':x.source.buffer_radio},
+                        'total':x.total, 'exchange':[ {"label": y.label, "amount": y.amount } for y in x.mobilization] } 
+                        for x in mob if x.destination.id == p.id]
+        
+        p_data["out"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
+                        'destination': {'id': str(x.destination.id), 'ext_id':x.destination.ext_id, 'lat': x.destination.lat, 'lon':x.destination.lon, 'buffer_radio':x.destination.buffer_radio},
+                        'total':x.total, 'exchange':[ {"label": y.label, "amount": y.amount } for y in x.mobilization] } 
+                        for x in mob if x.source.id == p.id]
+        
+        result.append(p_data)
+    
+    return jsonify(result)
     
 
 if __name__ == "__main__":
