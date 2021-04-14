@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import AuthUser from '../../services/AuthUser';
 
@@ -26,7 +26,10 @@ const Menu = ({ history }) =>  {
                 <ul className="navbar-nav mr-auto">                   
                     <li className="nav-item">
                         <a className="nav-link" href="#/nacional">Análisis nacional</a>
-                    </li>                    
+                    </li>
+                    <li className="nav-item">
+                        <a className="nav-link" href="#/productor">Análisis vereda</a>
+                    </li>
                     <li className="nav-item">
                         <a className="nav-link" href="#/productor">Análisis productor</a>
                     </li>

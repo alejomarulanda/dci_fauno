@@ -45,6 +45,7 @@ function Login() {
         if (chkBtn.context._errors.length === 0) {            
             AuthUser.login(email, password).then(
                 () => {
+                    setLoading(false);
                     //push("/user");
                     //window.location.reload();
                     return <Redirect to='/usuario' />
@@ -67,12 +68,12 @@ function Login() {
                 <Form ref={c => { setForm(c); }} onSubmit={handleLogin} >
                     <h1 className="h3 mb-3 fw-normal text-center">Iniciar sesión</h1>
                     <div className="form-floating">
-                        <label for="txtEmail">Email</label>
+                        <label htmlFor="txtEmail">Email</label>
                         <Input type="text" className="form-control" id="txtEmail" placeholder="name@example.com"
                             value={email} onChange={onChangeUsername} validations={[required]} />
                     </div>
                     <div className="form-floating">
-                        <label for="txtPassword">Password</label>
+                        <label htmlFor="txtPassword">Password</label>
                         <Input type="password" className="form-control" id="txtPassword" placeholder="Password"
                             value={password} onChange={onChangePassword} validations={[required]} />
                     </div>
