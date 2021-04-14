@@ -80,6 +80,7 @@ class LocalityNetwork(Document):
     source = ReferenceField(Locality)
     destination = ReferenceField(Locality)
     mobilization = ListField(EmbeddedDocumentField(Animals))
+    total = IntField(required=True)
 
 class User(Document):    
     public_id = StringField(required=True)
