@@ -59,13 +59,34 @@ print("Done!")
 
 
 ##############################################
-
+"""
 # Getting parameters for processing data
 ris_years = map(str.strip, conf.loc[conf["parameter"] == "ris_years","value"].values[0].split(","))
 ris_types_analysis =  map(str.strip, conf.loc[conf["parameter"] == "ris_types_analysis","value"].values[0].split(","))
 
-risk.distance_plot(inputs, ris_years, ris_types_analysis)
+risk.distance_plot(inputs, ["2018"], ["summary"])
 print("Done!")
+"""
+##############################################
+"""
+# Getting parameters for processing data
+ris_years = map(str.strip, conf.loc[conf["parameter"] == "ris_years","value"].values[0].split(","))
+ris_types_analysis =  map(str.strip, conf.loc[conf["parameter"] == "ris_types_analysis","value"].values[0].split(","))
+
+risk.risk_direct(inputs, ris_years, ris_types_analysis, glo_crs_wgs84)
+print("Done!")
+"""
+##############################################
+
+# Getting parameters for processing data
+ris_years = map(str.strip, conf.loc[conf["parameter"] == "ris_years","value"].values[0].split(","))
+ris_types_analysis =  map(str.strip, conf.loc[conf["parameter"] == "ris_types_analysis","value"].values[0].split(","))
+ris_type_plot = conf.loc[conf["parameter"] == "ris_type_plot","value"].values[0]
+
+#risk.total_risk(inputs, ris_years, ris_types_analysis, ris_type_plot)
+risk.total_risk(inputs, ["2017","2018"], ["summary"], ris_type_plot)
+print("Done!")
+
 
 ##############################################
 """
@@ -74,7 +95,7 @@ ris_years = map(str.strip, conf.loc[conf["parameter"] == "ris_years","value"].va
 ris_types_analysis =  map(str.strip, conf.loc[conf["parameter"] == "ris_types_analysis","value"].values[0].split(","))
 ris_type_plot = conf.loc[conf["parameter"] == "ris_type_plot","value"].values[0]
 
-#risk.total_risk(inputs, ris_years, ris_types_analysis)
-risk.total_risk(inputs, ["2017","2018"], ris_types_analysis, ris_type_plot)
+#impo.generate_outputs(inputs, outputs, ris_years, ris_types_analysis, ris_type_plot)
+impo.generate_outputs(inputs, outputs, ["2017","2018"], ["detail"], ris_type_plot)
 print("Done!")
 """
