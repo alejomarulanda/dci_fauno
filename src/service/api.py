@@ -199,12 +199,12 @@ def get_analysis_plot():
                             'rt': x.risk_total, 'rd':x.risk_direct, 'ri':x.risk_input, 'ro':x.risk_output  }
                             for x in risk if x.cattle_rancher.id == p.id ]
         
-        p_data["in"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
+        p_data["m_in"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
                         'source': {'id': str(x.source.id), 'ext_id':x.source.ext_id, 'lat': x.source.lat, 'lon':x.source.lon, 'buffer_radio':x.source.buffer_radio},
                         'total':x.total, 'exchange':[ {"label": y.label, "amount": y.amount } for y in x.mobilization] } 
                         for x in mob if x.destination.id == p.id]
         
-        p_data["out"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
+        p_data["m_out"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
                         'destination': {'id': str(x.destination.id), 'ext_id':x.destination.ext_id, 'lat': x.destination.lat, 'lon':x.destination.lon, 'buffer_radio':x.destination.buffer_radio},
                         'total':x.total, 'exchange':[ {"label": y.label, "amount": y.amount } for y in x.mobilization] } 
                         for x in mob if x.source.id == p.id]
