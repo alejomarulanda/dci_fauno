@@ -222,16 +222,16 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     print("Merging with localities")
     df_ran = pd.merge(df_ran, df_loc[["id","adm3_id"]], left_on="adm3_id", right_on='adm3_id', how='inner')
     df_ran = df_ran.rename(columns={"id":"adm_id"})    
-    df_ran["id"] = ""
+    dc_ran = []
     print("Importing: " + str(df_ran.shape[0]))
     for index, row in df_ran.iterrows():
         ran = CattleRancher(locality = row['adm_id'], ext_id = row['ext_id'], 
                             lat = row['lat'], lon =  row['lon'], buffer_radio = row['buffer_radio'], 
                             enable = True, created = date, updated = date)
         ran.save()
-        row["id"] = ran.id
+        dc_ran.append((ran.id,ran.ext_id))
         print_progress(df_ran.shape[0],index)
-        
+    df_ran = pd.DataFrame(dc_ran, columns=["id","ext_id"])
     
     # Analysis
     for y in years:
@@ -246,10 +246,11 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             print("Reading: " + ct_file)
             df_ctr = pd.read_csv(ct_file, encoding = "ISO-8859-1")            
             df_ctr["ext_id"] = df_ctr["ext_id"].astype(str)
-            
+
             print("Merging with cattle rancher")            
             df_ctr = pd.merge(df_ctr, df_ran[["id","ext_id"]], left_on="ext_id", right_on='ext_id', how='inner')                        
             print("Importing: " + str(df_ctr.shape[0]))
+
             for index, row in df_ctr.iterrows():                
                 ctr = CattleRancherRisk(cattle_rancher = row['id'], analysis = analysis.id, 
                                         buffer_radio =  row['buffer_radio'],
@@ -272,6 +273,7 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             df_ctn = pd.merge(df_ctn, df_ran[["id","ext_id"]], left_on="id_source", right_on='ext_id', how='inner')
             df_ctn = df_ctn.rename(columns={"id":"source"})
             print("Shape: " + str(df_ctn.shape[0]))
+
             print("Merging with cattle rancher destination")
             df_ctn = pd.merge(df_ctn, df_ran[["id","ext_id"]], left_on="id_destination", right_on='ext_id', how='inner')
             df_ctn = df_ctn.rename(columns={"id":"destination"})
@@ -295,7 +297,7 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
 
             print("Merging with cattle rancher source")
             df_lon = pd.merge(df_lon, df_loc[["id","adm3_id"]], left_on="adm3_source", right_on='adm3_id', how='inner')
-            df_lon = df_lon.rename(columns={"id":"source"})    
+            df_lon = df_lon.rename(columns={"id":"source"})
             print("Merging with cattle rancher destination")
             df_lon = pd.merge(df_lon, df_loc[["id","adm3_id"]], left_on="adm3_destination", right_on='adm3_id', how='inner')
             df_lon = df_lon.rename(columns={"id":"destination"})
