@@ -54,7 +54,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             print("Opening areas shp: " + file_shp)
             shp = gpd.read_file(file_shp)
             shp["ext_id"] = shp["ext_id"].astype(str).str.split('.', expand = True)[0]
-            shp["buffer_radio"] = shp["animals"] / shp["field_capa"]
+            #shp["buffer_radio"] = math.sqrt(shp['geometry'].area/math.pi)
             
             # Administrative level
             extract_master_data(shp, ["adm1_id","adm2_id","adm2_name"], os.path.join(outputs,"administrative_level.csv"), ["adm2_id"])

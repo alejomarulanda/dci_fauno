@@ -97,9 +97,7 @@ def create_data(inputs, path_shp_adm, src_crs, dst_crs):
     plots_folder = os.path.join(outputs_folder,"plots")
     if not os.path.exists(plots_folder):
         os.mkdir(plots_folder)
-    
-    #files = glob.glob(content_folder + os.path.sep + "*.csv")
-    #for file_src in files:
+        
     file_src = os.path.join(content_folder, "plots.csv")
     print("Opening: " + file_src)
     df_plots = pd.read_csv(file_src, encoding = "ISO-8859-1")
@@ -118,12 +116,7 @@ def create_data(inputs, path_shp_adm, src_crs, dst_crs):
     gdf_join = gpd.sjoin(gdf_plots, gdf_adm, how="inner", op='intersects')
     print(gdf_join.head())
 
-    # Create a folder for each shapefile with the year name
-    #f_paths = file_src.split(os.path.sep)
-    #f_folder = os.path.join(plots_folder,f_paths[len(f_paths) - 1].replace(".csv",""))
-    #if not os.path.exists(f_folder):
-        #os.mkdir(f_folder)
-    #output_file = os.path.join(f_folder,"plots.shp")
+    # Create a folder for each shapefile with the year name    
     output_file = os.path.join(plots_folder,"plots.shp")
     print("Saving: " + output_file)
     gdf_join.to_file(output_file)
@@ -140,9 +133,6 @@ def create_buffer(inputs, size_regions, dst_crs):
     if not os.path.exists(buffer_folder):
         os.mkdir(buffer_folder)
     
-    #plots_year_folders = os.listdir(plots_folder)
-    #for pyf in plots_year_folders:
-    #plots_file = os.path.join(plots_folder,pyf,"plots.shp")
     plots_file = os.path.join(plots_folder,"plots.shp")
     print("Opening plots shape file: " + plots_file)
     gdf_plots = gpd.read_file(plots_file)
@@ -155,19 +145,18 @@ def create_buffer(inputs, size_regions, dst_crs):
 
     print("Creating buffer")
     buffered = gdf_plots_buf.copy()
-    # buffer radio = animals/ field capacity
-    buffered['geometry'] = buffered.apply(lambda x: x.geometry.buffer(x.animals / x.field_capacity), axis=1)
-    # buffer area = pi x r^2
-    #buffered['area'] = buffered.apply(lambda x: math.pi * ((x.animals / x.field_capacity)**2), axis=1)
+
+    buffered['area_ha'] = buffered['animals'] / buffered['field_capacity']
+    buffered['area_m'] = buffered['area_ha'] * 10000
+    buffered["buffer_radio"] = math.sqrt(buffered['area_m'].area / math.pi)
+    buffered['geometry'] = buffered.apply(lambda x: x.geometry.buffer(x.buffer_radio), axis=1)    
     buffered['area'] = buffered['geometry'].area
+    
+    
 
     print("Reprojecting")
     buffered = buffered.to_crs(crs = from_epsg(dst_crs))
-
-    #f_folder = os.path.join(buffer_folder, pyf)
-    #if not os.path.exists(f_folder):
-        #os.mkdir(f_folder)
-    #output_file = os.path.join(f_folder,"buffer.shp")
+   
     output_file = os.path.join(buffer_folder,"buffer.shp")
     print("Saving: " + output_file)
     buffered.to_file(output_file)
