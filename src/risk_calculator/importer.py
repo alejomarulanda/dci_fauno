@@ -235,6 +235,8 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     
     # Analysis
     for y in years:
+        print("Year: " + str(y))
+        print("Types of analysis: ",type_analysis)
         for ta in type_analysis:
             print("Starting analysis: " + str(y) + "-" + ta)
             analysis = Analysis(year_start = int(y), year_end = int(y), type_analysis = ta)
@@ -303,9 +305,10 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             df_lon = df_lon.rename(columns={"id":"destination"})
 
             print("Importing: " + str(df_lon.shape[0]))
-            cols_animals = df_lon.columns.drop(["adm3_source","adm3_destination","type_destination","total","source","destination"])
+            cols_animals = df_lon.columns.drop(["adm3_source","adm3_destination","type_destination","total","source","destination","adm3_id_x","adm3_id_y"])
+            print(cols_animals)
             for index, row in df_lon.iterrows():
-                animals = [Animals(label = c, amount = row[c]) for c in cols_animals  if row[c] > 0]
+                animals = [Animals(label = c, amount = row[c]) for c in cols_animals  if int(row[c]) > 0]
                 lon = LocalityNetwork(analysis = analysis.id, source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
                 lon.save()
 
