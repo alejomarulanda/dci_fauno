@@ -144,19 +144,19 @@ def get_analysis_locality():
 
         l_data["locality"] = {'id':str(l.id), 'ext_id':l.ext_id, 'name':l.name }
         
-        l_data["risk"] = [{'year_start':x.analysis.year_start, 'year_end':x.analysis.year_end,
+        l_data["risk"] = [{'year_start':x.analysis.year_start, 'year_end':x.analysis.year_end, 'type':x.analysis.type_analysis,
                             'cr_amount':x.cattle_rancher_amount, 'def_area': x.def_ha, 'rt': x.risk_total,
                             'degree': x.degree,'degree_in': x.degree_in, 'degree_out': x.degree_out,  
                             'betweenness':x.betweenness, 'closeness':x.closeness }
                             for x in risk if x.locality.id == p.id ]
-        
-        l_data["in"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
-                        'source': {'id': str(x.source.id), 'ext_id':x.source.ext_id, 'name':x.source.name},
+                
+        l_data["in"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end, 'type':x.analysis.type_analysis,
+                        'locality_reference': {'id': str(x.source.id), 'ext_id':x.source.ext_id, 'name':x.source.name},
                         'total':x.total, 'exchange':[ {"label": y.label, "amount": y.amount } for y in x.mobilization] } 
                         for x in mob if x.destination.id == p.id]
         
-        l_data["out"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end,
-                        'source': {'id': str(x.destination.id), 'ext_id':x.destination.ext_id, 'name':x.destination.name},
+        l_data["out"] = [{'year_start': x.analysis.year_start, 'year_end':x.analysis.year_end, 'type':x.analysis.type_analysis,
+                        'locality_reference': {'id': str(x.destination.id), 'ext_id':x.destination.ext_id, 'name':x.destination.name},
                         'total':x.total, 'exchange':[ {"label": y.label, "amount": y.amount } for y in x.mobilization] } 
                         for x in mob if x.source.id == p.id]
         
