@@ -5,6 +5,9 @@
 /data/geoserver/
 /data/fauno_db/
 
+# Web App
+/src/app/fauno/public/data
+
 # Python
 */__pycache__
 *.__pycache__
