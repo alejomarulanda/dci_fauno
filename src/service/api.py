@@ -84,28 +84,30 @@ def login_user():
     return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
 @app.route('/api/v1/locality',methods=['GET'])
+@cross_origin()
 def get_all_locality():
-    adms = AdministrativeLevel.objects()
+    
     localities = Locality.objects(enable=True)
-    
-    result = []
-    
-    for adm in adms:   
-        a_data = {}           
-        a_data['id'] = adm.id 
-        a_data['name'] = adm.name 
-        a_data['ext_id'] = adm.ext_id
-        a_data['adm'] = adm.adm
+        
+    result = [{'adm_adm':x.adm_level.adm, 'adm_id':str(x.adm_level.id), 'adm_name':x.adm_level.name, 'adm_ext_id': x.adm_level.ext_id,
+               'loc_id':str(x.id), 'loc_name':x.name, 'loc_ext_id': x.ext_id } for x in localities]
 
-        a_data['localities'] = [{'id':x.id, 'name':x.name, 'ext_id': x.ext_id } for x in localities if x.adm_level is adm.id]
+    return jsonify(result)
 
-        if len(a_data['localities']) > 0:
-            result.append(a_data)   
+@app.route('/api/v1/locality/search',methods=['GET'])
+@cross_origin()
+def get_search_locality():
+    term = request.args.get("term")
+    localities = Locality.objects(Q(enable=True) & (Q(name__contains = term) | Q(adm_level__name__contains = term)) )
+        
+    result = [{'adm_adm':x.adm_level.adm, 'adm_id':str(x.adm_level.id), 'adm_name':x.adm_level.name, 'adm_ext_id': x.adm_level.ext_id,
+               'loc_id':str(x.id), 'loc_name':x.name, 'loc_ext_id': x.ext_id } for x in localities]
 
-    return jsonify({'regions': result})
+    return jsonify(result)
 
 
 @app.route('/api/v1/analysis/periods',methods=['GET'])
+@cross_origin()
 def get_analysis_periods():
     analysis = Analysis.objects()
     
@@ -120,6 +122,7 @@ def get_analysis_periods():
     return jsonify({'periods': result})
 
 @app.route('/api/v1/analysis/locality',methods=['GET'])
+@cross_origin()
 def get_analysis_locality():
     # Getting list of all plots requeste
     ids = request.args.get("ids").split(',')
@@ -136,7 +139,7 @@ def get_analysis_locality():
     # Search all all_localities data
     all_localities = localities_list + [x.source.id for x in mob] + [x.destination.id for x in mob]
 
-    risk = LocalityRisk.objects(cattle_rancher__in = all_localities)
+    risk = LocalityRisk.objects(locality__in = all_localities)
     result = []
 
     for l in localities:
@@ -221,4 +224,4 @@ if __name__ == "__main__":
     #app.run(host='0.0.0.0', port=5000)
 
 # Run in background
-# nohup python3.8 melisa.py > melisa.log 2>&1 &
+# nohup python3.8 api.py > api.log 2>&1 &
