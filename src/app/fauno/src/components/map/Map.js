@@ -20,7 +20,7 @@ function Map(props) {
                     <LayersControl position="topright">
                         <BaseLayer name="Deforestacion 2010">
                             <WMSTileLayer
-                                layers={'deforestation_annual:2010'}
+                                layers={'deforestation_detail:layer_def_detail_2010'}
                                 attribution=''
                                 url={url_def}
                                 format={"image/png"}
@@ -29,7 +29,7 @@ function Map(props) {
                         </BaseLayer>
                         <BaseLayer name="Deforestacion 2012">
                             <WMSTileLayer
-                                layers={'deforestation_annual:2012'}
+                                layers={'deforestation_detail:deforestation_annual'}
                                 attribution=''
                                 url={url_def}
                                 format={"image/png"}

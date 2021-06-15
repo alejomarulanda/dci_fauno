@@ -28,7 +28,7 @@ const Menu = ({ history }) =>  {
                         <a className="nav-link" href="#/nacional">Análisis nacional</a>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link" href="#/productor">Análisis vereda</a>
+                        <a className="nav-link" href="#/vereda">Análisis vereda</a>
                     </li>
                     <li className="nav-item">
                         <a className="nav-link" href="#/productor">Análisis productor</a>

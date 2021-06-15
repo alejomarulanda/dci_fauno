@@ -195,7 +195,7 @@ function Plot() {
                             predios de ganadería, tambien podrá observar cual es el área potencial
                             con el que se ha realizado el último análisis de riesgo.
                         </p>
-                        <Map center={map_country.center} zoom={map_country.zoom} buffers_main={map_plots} />
+                        <Map center={map_country.center} zoom={map_country.zoom} buffers_main={map_plots} type={analysis.id} />
                     </article>                    
                 </section>
                 <section className="row">                    
@@ -251,7 +251,7 @@ function Plot() {
                     </div>
                 <section className="row">
                     <article className="col-md-6">
-                    <Map center={map_country.center} zoom={map_country.zoom} buffers_main={m_plot} mobilization={d_mobilization}  />
+                    <Map center={map_country.center} zoom={map_country.zoom} buffers_main={m_plot} mobilization={d_mobilization} type={analysis.id}   />
                     </article>
                     <article className="col-md-6">
                         <h2 className="text-center">Importación</h2>
