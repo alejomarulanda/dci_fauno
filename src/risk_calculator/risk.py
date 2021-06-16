@@ -90,7 +90,8 @@ def distance_plot(inputs, years, types_analysis):
         os.mkdir(outputs_folder)
     
     # CPUS to use
-    cpus = mp.cpu_count() - 1 
+    #cpus = mp.cpu_count() - 1 
+    cpus = 20
     print("CPUs: " + str(cpus))
     pool = mp.Pool(processes=cpus)
 
@@ -181,7 +182,8 @@ def risk_direct(inputs, years, types_analysis, dst_crs):
         os.mkdir(outputs_folder)
     
     # CPUS to use
-    cpus = mp.cpu_count() - 1 
+    #cpus = mp.cpu_count() - 1 
+    cpus = 20
     pool = mp.Pool(processes=cpus)
     print("CPUs: " + str(cpus))
 
@@ -249,7 +251,8 @@ def total_risk(inputs, years, types_analysis, type_plot):
         os.mkdir(outputs_folder)
     
     # CPUS to use
-    cpus = mp.cpu_count() - 2 
+    #cpus = mp.cpu_count() - 2 
+    cpus = 20
     pool = mp.Pool(processes=cpus)
     print("CPUs: " + str(cpus))
 

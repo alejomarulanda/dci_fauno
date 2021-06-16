@@ -162,12 +162,13 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             print("Pivoting localities risk")
             loc_col = ["rt","animals","area","def_area"]
             print(df_ct.head())
-            loc_risk = pd.pivot_table(df_ct, values=loc_col, index=["adm3_id"], aggfunc=[np.sum, np.mean],fill_value=0.0)
+            loc_risk = pd.pivot_table(df_ct, values=loc_col, index=["adm3_id"], aggfunc=[np.sum, np.mean, lambda x: len(x.unique())],fill_value=0.0)
             print(loc_risk.head())
             loc_risk.reset_index(inplace=True)
 
             print("Merging with centrality indicators")
             l_r = pd.merge(loc_risk, g_indicators, left_on = "adm3_id",right_on="adm3_id",how='inner')
+            l_r.columns = ["adm3_id","adm3_id","animals_sum","area_sum","def_area_sum","rt_sum","animals_mean","area_mean","def_area_mean","rt_mean","cd","cdi","cdo","cc","cb"]
 
             loc_r_file = os.path.join(outputs_folder,"locality_risk.csv")
             print("Saving: " + loc_r_file)
@@ -189,10 +190,17 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     df_adm["adm1_id"] = df_adm["adm1_id"].astype(str)
     df_adm["adm2_id"] = df_adm["adm2_id"].astype(str)
     df_adm["id"] = ""
-    print("Importing: " + str(df_adm.shape[0]))
+    print("Getting current records from database")
+    db_administrative = AdministrativeLevel.objects()
+    print("Importing: " + str(df_adm.shape[0]))    
     for index, row in df_adm.iterrows():
-        adm = AdministrativeLevel(name = row['adm2_name'], adm = row['adm1_id'], ext_id = row['adm2_id'], enable = True, created = date, updated = date)
-        adm.save()
+        adm = None
+        adm_tmp = [x for x in db_administrative if x.ext_id ==  row['adm2_id']]
+        if len(adm_tmp) <= 0:
+            adm = adm_tmp[0]
+        else:
+            adm = AdministrativeLevel(name = row['adm2_name'], adm = row['adm1_id'], ext_id = row['adm2_id'], enable = True, created = date, updated = date)
+            adm.save()
         row["id"] = adm.id
         print_progress(df_adm.shape[0],index)
     
@@ -206,10 +214,17 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     df_loc = pd.merge(df_loc, df_adm[["id","adm2_id"]], left_on="adm2_id", right_on='adm2_id', how='inner')
     df_loc = df_loc.rename(columns={"id":"adm_id"})    
     df_loc["id"] = ""
+    print("Getting current records from database")
+    db_locality = Locality.objects()
     print("Importing: " + str(df_loc.shape[0]))
     for index, row in df_loc.iterrows():
-        loc = Locality(adm_level = row['adm_id'], name = row['adm3_name'], ext_id = row['adm3_id'], enable = True, created = date, updated = date)
-        loc.save()
+        loc = None
+        loc_tmp = [x for x in db_locality if x.ext_id ==  row['adm3_id']]
+        if len(adm_tmp) <= 0:
+            loc = loc_tmp[0]
+        else:
+            loc = Locality(adm_level = row['adm_id'], name = row['adm3_name'], ext_id = row['adm3_id'], enable = True, created = date, updated = date)
+            loc.save()
         row["id"] = loc.id
         print_progress(df_loc.shape[0],index)
     
@@ -223,12 +238,20 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     df_ran = pd.merge(df_ran, df_loc[["id","adm3_id"]], left_on="adm3_id", right_on='adm3_id', how='inner')
     df_ran = df_ran.rename(columns={"id":"adm_id"})    
     dc_ran = []
+    print("Getting current records from database")
+    db_cr = CattleRancher.objects()    
     print("Importing: " + str(df_ran.shape[0]))
     for index, row in df_ran.iterrows():
-        ran = CattleRancher(locality = row['adm_id'], ext_id = row['ext_id'], 
+        ran = None
+        ran_tmp = [x for x in db_cr if x.ext_id ==  row['ext_id']]
+        if len(ran_tmp) <= 0:
+            ran = ran_tmp[0]
+        else:
+            ran = CattleRancher(locality = row['adm_id'], ext_id = row['ext_id'], 
+                            type_plot = "PREDIO", 
                             lat = row['lat'], lon =  row['lon'], buffer_radio = row['buffer_radio'], 
                             enable = True, created = date, updated = date)
-        ran.save()
+            ran.save()
         dc_ran.append((ran.id,ran.ext_id))
         print_progress(df_ran.shape[0],index)
     df_ran = pd.DataFrame(dc_ran, columns=["id","ext_id"])
