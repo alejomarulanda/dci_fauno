@@ -23,6 +23,7 @@ class CattleRancher(Document):
     lat = FloatField(required=True)
     lon = FloatField(required=True)
     buffer_radio = FloatField(required=True)
+    type_plot = StringField(required=True)
     created = DateTimeField(required=True)
     updated = DateTimeField(required=True)
 
