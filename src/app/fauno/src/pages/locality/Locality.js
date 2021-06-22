@@ -24,7 +24,7 @@ function Locality() {
     const [map_country, setMap_country] = React.useState({ center: [4.64, -74.2], zoom: 6 });
     
     const [d_data, setDData] = React.useState();
-    const [map_plots, setMap_plots] = React.useState({});
+    const [map_localities, setMapLocalities] = React.useState();
     const [c_plot, setCurrentPlot] = React.useState({});
     const [m_plot, setMPlot] = React.useState();
     const [d_mobilization, setDMobilization] = React.useState([]);
@@ -43,7 +43,6 @@ function Locality() {
             error => {
                 const resMessage = (error.response && error.response.data && error.response.data.message) ||
                     error.message || error.toString();
-                setLoading(false);
             }
         ); 
       }
@@ -57,11 +56,24 @@ function Locality() {
         e.preventDefault();
         setLoading(true);
         const lo = localities.map((d2)=>{return d2.value;});
+        // Getting data from API about localities
         LocalityService.search(lo).then(
             (data) => {
                 if (data) {
-                    console.log(data);
                     setDData(data);
+                    // Getting geojson from mapserver
+                    LocalityService.geojson(lo).then(
+                        (data_geo)=>{                                      
+                            setMapLocalities(data_geo);
+                            setLoading(false);
+                        },
+                        error => {
+                            const resMessage = (error.response && error.response.data && error.response.data.message) ||
+                                error.message || error.toString();
+                            setLoading(false);
+                        }
+                    );
+                    //console.log(geo);
                     // Fixing data for plots about risk
                     /*const datum_summary = data.map((d) => {
                         return  {
@@ -78,7 +90,7 @@ function Locality() {
                     setMap_plots(m_plots);
                     changeCurrentPlot(m_plots[0], data);*/
                 }
-                setLoading(false);
+                //setLoading(false);
             },
             error => {
                 const resMessage = (error.response && error.response.data && error.response.data.message) ||
@@ -135,9 +147,9 @@ function Locality() {
                         <p className="text-justify">
                             En el siguiente mapa usted podrá observar dondé se encuentran ubicados los
                             predios de ganadería, tambien podrá observar cual es el área potencial
-                            con el que se ha realizado el último análisis de riesgo.
+                            con el que se ha realizado el último análisis de riesgo.                            
                         </p>
-                        <Map center={map_country.center} zoom={map_country.zoom} buffers_main={map_plots} type={analysis.id} />
+                        <Map center={map_country.center} zoom={map_country.zoom} geo={map_localities} type={analysis.id} />
                     </article>                    
                 </section>
                 <section className="row">                    
@@ -174,12 +186,7 @@ function Locality() {
                 <div className="row">
                         <label htmlFor="cboPlot" className="col-md-2 col-form-label">Predio:</label>
                         <div className="col-md-4">
-                            <DropdownButton id="cboPlot" title={c_plot.ext_id}>                    
-                                {map_plots && map_plots.length > 0 ? map_plots.map((item, idx) => (
-                                    <Dropdown.Item  key={item.ext_id}>{item.ext_id}</Dropdown.Item>
-                                )):
-                                ""}
-                            </DropdownButton>
+                            
                         </div>              
                         <label htmlFor="cboPeriod" className="col-md-2 col-form-label">Período:</label>
                         <div className="col-md-4">

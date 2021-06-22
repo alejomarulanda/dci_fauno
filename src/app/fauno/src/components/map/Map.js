@@ -80,7 +80,7 @@ function Map(props) {
                         )
                     }) :
                     ""}
-                {props.geo ? <GeoJSON attribution="" key={props.geo.key} data={props.geo.json} /> : <GeoJSON attribution="" />}
+                {props.geo  ? <GeoJSON attribution="" key={"localities_geojson"} data={props.geo} /> : <GeoJSON attribution="" />}
 
             </MapContainer>
         </>
