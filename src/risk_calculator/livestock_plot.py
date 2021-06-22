@@ -147,9 +147,9 @@ def create_buffer(inputs, size_regions, dst_crs):
     buffered = gdf_plots_buf.copy()
 
     buffered['area_ha'] = buffered['animals'] / buffered['field_capacity']
-    buffered['area_m'] = buffered['area_ha'] * 10000
-    buffered["buffer_radio"] = math.sqrt(buffered['area_m'].area / math.pi)
-    buffered['geometry'] = buffered.apply(lambda x: x.geometry.buffer(x.buffer_radio), axis=1)    
+    buffered['area_m'] = buffered['area_ha'] * 10000.0
+    buffered["buffer_r"] = buffered.apply(lambda x: math.sqrt(x.area_m / math.pi), axis=1)
+    buffered['geometry'] = buffered.apply(lambda x: x.geometry.buffer(x.buffer_r), axis=1)    
     buffered['area'] = buffered['geometry'].area
     
     
