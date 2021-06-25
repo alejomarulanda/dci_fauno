@@ -23,10 +23,7 @@ const Menu = ({ history }) =>  {
                 <span className="navbar-toggler-icon"></span>
             </button>
             <div className="collapse navbar-collapse" id="navbarCollapse">
-                <ul className="navbar-nav mr-auto">                   
-                    <li className="nav-item">
-                        <a className="nav-link" href="#/nacional">Análisis nacional</a>
-                    </li>
+                <ul className="navbar-nav mr-auto">                                       
                     <li className="nav-item">
                         <a className="nav-link" href="#/vereda">Análisis vereda</a>
                     </li>
