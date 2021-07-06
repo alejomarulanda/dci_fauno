@@ -252,7 +252,7 @@ def total_risk(inputs, years, types_analysis, type_plot):
     
     # CPUS to use
     #cpus = mp.cpu_count() - 2 
-    cpus = 20
+    cpus = 10
     pool = mp.Pool(processes=cpus)
     print("CPUs: " + str(cpus))
 

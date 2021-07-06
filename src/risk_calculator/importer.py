@@ -196,7 +196,7 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     for index, row in df_adm.iterrows():
         adm = None
         adm_tmp = [x for x in db_administrative if x.ext_id ==  row['adm2_id']]
-        if len(adm_tmp) <= 0:
+        if len(adm_tmp) > 0:
             adm = adm_tmp[0]
         else:
             adm = AdministrativeLevel(name = row['adm2_name'], adm = row['adm1_id'], ext_id = row['adm2_id'], enable = True, created = date, updated = date)
@@ -220,7 +220,7 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     for index, row in df_loc.iterrows():
         loc = None
         loc_tmp = [x for x in db_locality if x.ext_id ==  row['adm3_id']]
-        if len(adm_tmp) <= 0:
+        if len(adm_tmp) > 0:
             loc = loc_tmp[0]
         else:
             loc = Locality(adm_level = row['adm_id'], name = row['adm3_name'], ext_id = row['adm3_id'], enable = True, created = date, updated = date)
@@ -244,7 +244,7 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
     for index, row in df_ran.iterrows():
         ran = None
         ran_tmp = [x for x in db_cr if x.ext_id ==  row['ext_id']]
-        if len(ran_tmp) <= 0:
+        if len(ran_tmp) > 0:
             ran = ran_tmp[0]
         else:
             ran = CattleRancher(locality = row['adm_id'], ext_id = row['ext_id'], 
@@ -312,6 +312,27 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
                 ctn.save()
                 print_progress(df_ctr.shape[0],index)
 
+            # Localities Risk
+            print("Locality Risk")
+            lt_file = os.path.join(outputs,ta,str(y),"locality_risk.csv")
+            print("Reading: " + lt_file)
+            df_lr = pd.read_csv(lt_file, encoding = "ISO-8859-1")            
+            df_lr["adm3_id"] = df_lr["adm3_id"].astype(str)
+
+            print("Merging with localities")      
+            df_lr = pd.merge(df_lr, df_loc[["id","adm3_id"]], left_on="adm3_id", right_on='adm3_id', how='inner')                       
+            print("Importing: " + str(df_lr.shape[0]))
+
+            for index, row in df_lr.iterrows():                
+                lr = LocalityRisk(locality = row['id'], analysis = analysis.id, 
+                                        def_ha =  row['def_ha'],
+                                        cattle_rancher_amount =  0,
+                                        risk_total = row['risk_total'],
+                                        degree = row['degree'], degree_in = row['degree_in'], degree_out = row['degree_out'], 
+                                        betweenness = row['betweenness'], closeness = row['closeness'])
+                lr.save()
+                print_progress(df_lr.shape[0],index)
+
             # Localities Network
             print("Localities Network")
             ln_file = os.path.join(outputs,ta,str(y),"locality_network.csv")
@@ -328,8 +349,7 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             df_lon = df_lon.rename(columns={"id":"destination"})
 
             print("Importing: " + str(df_lon.shape[0]))
-            cols_animals = df_lon.columns.drop(["adm3_source","adm3_destination","type_destination","total","source","destination","adm3_id_x","adm3_id_y"])
-            print(cols_animals)
+            cols_animals = df_lon.columns.drop(["adm3_source","adm3_destination","type_destination","total","source","destination","adm3_id_x","adm3_id_y"])            
             for index, row in df_lon.iterrows():
                 animals = [Animals(label = c, amount = row[c]) for c in cols_animals  if int(row[c]) > 0]
                 lon = LocalityNetwork(analysis = analysis.id, source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
