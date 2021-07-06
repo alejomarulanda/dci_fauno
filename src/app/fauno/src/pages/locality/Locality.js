@@ -25,7 +25,7 @@ function Locality() {
 
     const [d_data, setDData] = React.useState();
     const [map_localities, setMapLocalities] = React.useState();
-    const [c_locality, setCurrentLocality] = React.useState({});
+    const [c_locality, setCLocality] = React.useState({});
     const [d_mobilization, setDMobilization] = React.useState();
 
     const [d_summary, setDSummary] = React.useState([]);
@@ -61,7 +61,7 @@ function Locality() {
     * @param {*data} d_data Data gotten from the services
     */
     function changeCurrentLocality(e, d_data) {
-        setCurrentLocality(e);
+        setCLocality(e);
         // Loading data for mobilization                 
         const d = d_data.filter((d2) => { return d2.locality.ext_id === e.value })[0];
         const m_out = d.m_out.filter((d2) => { return d2.type === analysis.id });
@@ -74,22 +74,15 @@ function Locality() {
         for (var i = 0; i < m_in.length; i++) {
             m_mobility.push({ "focus": d.locality, "mob": m_in[i].locality_reference, "total": m_in[i].total, "type": "source" });
         }
-        //changeCurrentPeriod(c_period, d_data, e, analysis);
+        changeCurrentPeriod(list_periods[0], d_data, e, analysis);
 
         // Loading geodata
         const ids = m_mobility.map((da) => { return da.mob.ext_id });
         ids.push(d.locality.ext_id);
-        console.log(ids);
         LocalityService.geojson(ids).then(
             (data_geo2) => {
-                //console.log(d);
-                //setMLocality([d.locality]);
-                //console.log(data_geo2);
                 setDMobilization(data_geo2);
-
-                //setMapLocalities(data_geo2);
-
-                //setLoading(false);
+                setLoading(false);
             },
             error => {
                 const resMessage = (error.response && error.response.data && error.response.data.message) ||
@@ -97,6 +90,46 @@ function Locality() {
                 setLoading(false);
             }
         );
+    }
+
+    /**
+     * Event which updates plots of mobilization when period is changed
+     * @param {*period} e Current period
+     * @param {*} d_data Full data
+     * @param {*} m_locality Current locality
+     * @param {*} analysis Current analysis
+     */
+     function changeCurrentPeriod(e, d_data, m_locality, analysis){
+        /*console.log(e);
+        console.log(d_data);
+        console.log(m_locality);
+        console.log(analysis);*/
+        setCPeriod(e);
+       
+        const d = d_data.filter((d2)=>{ return d2.locality.ext_id === m_locality.value})[0];
+        const m_out_tmp = d.m_out.filter((d2)=>{ return d2.type === analysis.id});
+        const m_in_tmp = d.m_in.filter((d2)=>{ return d2.type === analysis.id});
+        
+        setDExport(getMobilization(m_out_tmp));
+        setDImport(getMobilization(m_in_tmp));
+    }
+
+    /**
+     * Method which extracts mobilization data from general data in specific format
+     * to draw plots about mobilization
+     * @param {*array mobilization} mob_tmp 
+     * @returns Array of plots for NDV3
+     */
+     function getMobilization(mob_tmp){
+        var mob = []; 
+        for(var i = 0; i< mob_tmp.length; i++){
+            mob.push({
+                    key: "Vereda " + mob_tmp[i].locality_reference.ext_id,
+                    bar: true,
+                    values: mob_tmp[i].exchange.map((d2) => { return { label: d2.label, value: parseFloat(d2.amount) }; })
+                });
+        }
+        return mob;
     }
 
 
@@ -111,18 +144,18 @@ function Locality() {
         // Getting data from API about localities
         LocalityService.search(lo).then(
             (data) => {
-                if (data) {
+                if (data) {                    
                     setDData(data);
                     // Getting geojson from mapserver
                     LocalityService.geojson(lo).then(
                         (data_geo) => {
                             setMapLocalities(data_geo);
-                            // Fixing data for plots about risk
+                            // Fixing data for plots about risk                            
                             const datum_summary = data.map((d) => {
                                 return {
                                     key: d.locality.name,
                                     bar: true,
-                                    values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => { return { label: d2.year_start + '-' + d2.year_end, value_risk: parseFloat(d2.rt), value_def: parseFloat(d2.def_ha) }; })
+                                    values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => { return { label: d2.year_start + '-' + d2.year_end, value_risk: parseFloat(d2.rt), value_def: parseFloat(d2.def_area) }; })
                                 };
                             });
                             // Loading information for plots
@@ -224,7 +257,7 @@ function Locality() {
                 </section>
                 <section className="row">
                     <article className="col-md-12">
-                        <h2 className="text-center">Mobilización</h2>
+                        <h2 className="text-center">Movilización</h2>
                         <p className="text-justify">
                             En esta sección se puede analizar la información correspondiente los movimientos de ganadería realizados por los predios
                         </p>

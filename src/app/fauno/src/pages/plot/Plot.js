@@ -223,7 +223,7 @@ function Plot() {
                 </section>
                 <section className="row">
                     <article className="col-md-12">
-                        <h2 className="text-center">Mobilización</h2>
+                        <h2 className="text-center">Movilización</h2>
                         <p className="text-justify">
                             En esta sección se puede analizar la información correspondiente los movimientos de ganadería realizados por los predios                            
                         </p>

@@ -4,7 +4,7 @@ import * as turf from '@turf/turf'
 import { MapContainer, TileLayer, GeoJSON, LayersControl, WMSTileLayer, Polygon, CircleMarker, Tooltip, Marker, Popup, Polyline } from 'react-leaflet'
 
 function Map(props) {
-    const [url_def, setUrlDef] = React.useState("http://localhost:8600/geoserver/deforestation_annual/wms");
+    const [url_def, setUrlDef] = React.useState("http://localhost:8600/geoserver/deforestacion_anual/wms");
     //const [color_risk, setColorRisk] = React.useState(["#33cc33", "#ffff66", "#ffcc66", "#ff9966", "#ff0066"]);
     const { BaseLayer } = LayersControl;
 
@@ -20,7 +20,7 @@ function Map(props) {
                     <LayersControl position="topright">
                         <BaseLayer name="Deforestacion 2010">
                             <WMSTileLayer
-                                layers={'deforestation_detail:layer_def_detail_2010'}
+                                layers={'deforestacion_anual:2010'}
                                 attribution=''
                                 url={url_def}
                                 format={"image/png"}
@@ -29,7 +29,16 @@ function Map(props) {
                         </BaseLayer>
                         <BaseLayer name="Deforestacion 2012">
                             <WMSTileLayer
-                                layers={'deforestation_detail:deforestation_annual'}
+                                layers={'deforestacion_anual:2012'}
+                                attribution=''
+                                url={url_def}
+                                format={"image/png"}
+                                transparent={true}
+                            />
+                        </BaseLayer>
+                        <BaseLayer name="Deforestacion 2013">
+                            <WMSTileLayer
+                                layers={'deforestacion_anual:2013'}
                                 attribution=''
                                 url={url_def}
                                 format={"image/png"}

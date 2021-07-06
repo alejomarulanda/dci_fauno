@@ -12,7 +12,7 @@ class LocalityService {
     };
 
     geojson(ids){
-        const url = "http://localhost:8600/geoserver/Localities/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=Localities%3Aadm&maxFeatures=50&outputFormat=application%2Fjson&CQL_FILTER=adm3_id in (" + ids + ")&SRSNAME=EPSG:4326";
+        const url = "http://localhost:8600/geoserver/localities/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=localities:adm&maxFeatures=50&outputFormat=application/json&CQL_FILTER=adm3_id in (" + ids + ")&SRSNAME=EPSG:4326";
         return axios.get(url, {})
             .then(response => {
                 return response.data;
