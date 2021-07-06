@@ -33,6 +33,7 @@ docker run --name fauno_db -p 27017:27017 -v D:/CIAT/Code/BID/dci_fauno/data/fau
 ##########################################################
 
 docker run -it --rm -v /dapadfs/:/dapadfs/ dapaciat/python:3.9-busterlatest /bin/bash
+cd /dapadfs/workspace_cluster_9/Aichi13/BID/risk_calculator/script/
 
 ##########################################################
 
