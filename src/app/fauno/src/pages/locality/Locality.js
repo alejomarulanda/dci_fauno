@@ -124,7 +124,7 @@ function Locality() {
         var mob = []; 
         for(var i = 0; i< mob_tmp.length; i++){
             mob.push({
-                    key: "Vereda " + mob_tmp[i].locality_reference.ext_id,
+                    key: mob_tmp[i].locality_reference.name,
                     bar: true,
                     values: mob_tmp[i].exchange.map((d2) => { return { label: d2.label, value: parseFloat(d2.amount) }; })
                 });
