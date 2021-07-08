@@ -198,7 +198,7 @@ def get_analysis_plot():
         p_data["risk"] = [{'year_start':x.analysis.year_start, 'year_end':x.analysis.year_end, 'type':x.analysis.type_analysis,
                             'lat': x.lat, 'lon':x.lon, 
                             'animals':x.animals_amount, 'buffer_radio':x.buffer_radio, 'buffer_size':x.buffer_size,
-                            'def_prop_area': x.def_prop, 'def_prop_distance': x.def_distance_prop,'def_area': x.def_ha, 'def_dist': x.def_distance,  
+                            'def_prop_area': x.def_prop, 'def_prop_distance': x.def_distance_prop,'def_area': x.def_ha, 'def_dist': x.def_distance_m,  
                             'rt': x.risk_total, 'rd':x.risk_direct, 'ri':x.risk_input, 'ro':x.risk_output  }
                             for x in risk if x.cattle_rancher.id == p.id ]
         
