@@ -7,6 +7,7 @@ import { DropdownButton, Dropdown } from 'react-bootstrap';
 import Map from '../../components/map/Map';
 import DirectRisk from '../../components/direct_risk/DirectRisk';
 import TotalRiskPlot from '../../components/total_risk_plot/TotalRiskPlot';
+import ImportExport from '../../components/import_export/ImportExport';
 
 import SearchPlots from "../../services/SearchPlots";
 
@@ -255,10 +256,7 @@ function Plot() {
                     <Map center={map_country.center} zoom={map_country.zoom} buffers_main={m_plot} mobilization={d_mobilization} type={analysis.id}   />
                     </article>
                     <article className="col-md-6">
-                        <h2 className="text-center">Importación</h2>
-                        <NVD3Chart id="pltRiskImport" className="RiskMobilization" datum={d_import} type="multiBarChart" x="label" y="value" />
-                        <h2 className="text-center">Exportación</h2>
-                        <NVD3Chart id="pltRiskExport" className="RiskMobilization" datum={d_export} type="multiBarChart" x="label" y="value" />
+                        <ImportExport import={d_import} export={d_export} />                        
                     </article>
                 </section>
 

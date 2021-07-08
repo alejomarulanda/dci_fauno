@@ -11,8 +11,7 @@ function TotalRiskPlot(props) {
         xaxis: { categories: ["Riesgo directo", "Riesgo de entrada", "Riesgo de salida"] }
     });
 
-    React.useEffect(() => {
-        console.log("cambio");
+    React.useEffect(() => {        
     }, []);
 
     return (
