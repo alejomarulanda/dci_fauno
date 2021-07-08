@@ -5,6 +5,8 @@ import NVD3Chart from 'react-nvd3';
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 
 import Map from '../../components/map/Map';
+import DirectRisk from '../../components/direct_risk/DirectRisk';
+import TotalRiskPlot from '../../components/total_risk_plot/TotalRiskPlot';
 
 import SearchPlots from "../../services/SearchPlots";
 
@@ -30,6 +32,7 @@ function Plot() {
     const [d_mobilization, setDMobilization] = React.useState([]);
 
     const [d_summary, setDSummary] = React.useState([]);
+    const [d_radar, setDRadar] = React.useState();
     const [d_import, setDImport] = React.useState([]);
     const [d_export, setDExport] = React.useState([]);
 
@@ -129,10 +132,29 @@ function Plot() {
                         return  {
                             key: "Predio " + d.plot.ext_id,
                             bar: true,
-                            values: d.risk.filter((d2)=>{ return d2.type == analysis.id}).map((d2) => { return { label: d2.year_start + '-' + d2.year_end, value_risk: parseFloat(d2.rt), value_def: parseFloat(d2.def_area) }; })
+                            values: d.risk.filter((d2)=>{ return d2.type == analysis.id}).map((d2) => { return { 
+                                label: d2.year_start + '-' + d2.year_end, 
+                                def_area: parseFloat(d2.def_area), 
+                                def_dist:parseFloat(d2.def_dist),
+                                rd:parseFloat(d2.rd),
+                                ri:parseFloat(d2.ri),
+                                ro:parseFloat(d2.ro),
+                                rt:parseFloat(d2.rt) }; })
                         };
                     });
                     setDSummary(datum_summary);
+                    // Data for spider
+                    const radar_d = list_periods.map((p) => {                        
+                        return {
+                            period : p,
+                            radar : datum_summary.map((d) => {                                 
+                                const tmp = d.values.filter((v) => { return v.label === p.label; });                                
+                                const tmp_d = tmp.length > 0 ? [tmp[0].rd, tmp[0].ri, tmp[0].ro] : [0, 0, 0];
+                                return { name: d.key, data: tmp_d } 
+                            })
+                        }
+                    });
+                    setDRadar(radar_d);
                     // Loading plots for map
                     const m_plots = data.map((d)=>{
                         return d.plot;
@@ -198,29 +220,8 @@ function Plot() {
                         <Map center={map_country.center} zoom={map_country.zoom} buffers_main={map_plots} type={analysis.id} />
                     </article>                    
                 </section>
-                <section className="row">                    
-                    <article className="col-md-6">
-                        <h2 className="text-center">Riesgo</h2>
-                        <p className="text-justify">
-                            El siguiente gráfico le permite observar cual ha sido el nivel de riesgo de
-                            los predios de interés a lo largo del tiempo.
-                        </p>
-                        <div id="pltRiskSummary" className="RiskSummary">
-                            <NVD3Chart id="pltRiskSummary"  datum={d_summary} type="multiBarChart" showValues="true" x="label" y="value_risk" />
-                        </div>
-                    </article>
-                    <article className="col-md-6">
-                        <h2 className="text-center">Deforestación potencial</h2>
-                        <p className="text-justify">
-                            Las zonas de los predios son representadas como áreas potenciales de influencia, donde posiblemente se puede
-                            ubicar la zonas para actividad de ganadería. La deforetación que se presenta en la siguiente gráfica
-                            se ubica en esas áreas potenciales de los predios.
-                        </p>
-                        <div id="pltDeforestation" className="DeforestationSummary">
-                            <NVD3Chart id="pltDeforestation"  datum={d_summary} type="multiBarChart" showValues="true" x="label" y="value_def" />
-                        </div>
-                    </article>         
-                </section>
+                <DirectRisk id="comDirectRisk" datum={d_summary} />
+                <TotalRiskPlot id="comTotalRisk" datum={d_summary} datum_radar={d_radar}/>
                 <section className="row">
                     <article className="col-md-12">
                         <h2 className="text-center">Movilización</h2>
