@@ -305,7 +305,7 @@ def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_se
             print("Shape: " + str(df_ctn.shape[0]))
 
             print("Importing: " + str(df_ctn.shape[0]))
-            cols_animals = df_ctn.columns.drop(["id_source","id_destination","type_destination","total","adm3_source","adm3_destination","source","destination","ext_id_x","ext_id_y"])
+            cols_animals = df_ctn.columns.drop(["id_source","id_destination","type_destination","total","adm3_source","adm3_destination","source","destination","ext_id_x","ext_id_y", "AÑO","MES","DIA"])
             for index, row in df_ctn.iterrows():
                 animals = [Animals(label = c, amount = row[c]) for c in cols_animals if row[c] > 0]
                 ctn = CattleRancherNetwork(analysis = analysis.id,source = row['source'], destination = row['destination'], mobilization = animals, total = row['total'])
