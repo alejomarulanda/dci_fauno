@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import NVD3Chart from 'react-nvd3';
 import Chart from "react-apexcharts";
-
 import { Carousel, CarouselItem } from 'react-bootstrap';
 
-import './TotalRiskPlot.css';
+import PlotBar from '../plot_bar/PlotBar';
 
 function TotalRiskPlot(props) {
     const [options_radar, setOptionsRadar] = React.useState({        
         xaxis: { categories: ["Riesgo directo", "Riesgo de entrada", "Riesgo de salida"] },
-        yaxis: { min: 0, max:4, forceNiceScale: true}
+        yaxis: { min: 0, max:4, forceNiceScale: true},
+        legend: { position: 'top' }
     });
 
     React.useEffect(() => {        
@@ -36,13 +35,13 @@ function TotalRiskPlot(props) {
                     </Carousel>
                 </article>
                 <article className="col-md-6">
-                    <h2 className="text-center">Riesgo total</h2>
-                    <p className="text-justify">
-                        El siguiente gráfico le permite observar cual es el riesgo total de cada sitio.
-                    </p>
-                    <div className="TotalRiskPlot">
-                        <NVD3Chart id="pltTotalRisk" forceY={[0, 4]} datum={props.datum} type="multiBarChart" showValues="true" x="label" y="rt" />
-                    </div>
+                    <PlotBar id="plbRisk" 
+                        title="Riesgo total"
+                        description="El siguiente gráfico le permite observar cual es el riesgo total de cada sitio."
+                        datum={props.datum}
+                        x="label" 
+                        y="rt" 
+                        forceY={[0, 4]} />
                 </article>
             </section>
         </>
