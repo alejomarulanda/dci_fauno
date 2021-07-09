@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import Form from "react-validation/build/form";
-import Input from "react-validation/build/input";
-import NVD3Chart from 'react-nvd3';
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 
 
 import Map from '../../components/map/Map';
 import TotalRiskLocality from '../../components/total_risk_locality/TotalRiskLocality';
+import Centrality from '../../components/centrality/Centrality';
 import ImportExport from '../../components/import_export/ImportExport';
 
 import LocalityService from "../../services/LocalityService";
@@ -109,8 +108,8 @@ function Locality() {
         setCPeriod(e);
        
         const d = d_data.filter((d2)=>{ return d2.locality.ext_id === m_locality.value})[0];
-        const m_out_tmp = d.m_out.filter((d2)=>{ return d2.type === analysis.id});
-        const m_in_tmp = d.m_in.filter((d2)=>{ return d2.type === analysis.id});
+        const m_out_tmp = d.m_out.filter((d2)=>{ return d2.type === analysis.id && d2.year_start == e.start});
+        const m_in_tmp = d.m_in.filter((d2)=>{ return d2.type === analysis.id && d2.year_start == e.start});
         
         setDExport(getMobilization(m_out_tmp));
         setDImport(getMobilization(m_in_tmp));
@@ -157,7 +156,14 @@ function Locality() {
                                 return {
                                     key: d.locality.name,
                                     bar: true,
-                                    values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => { return { label: d2.year_start + '-' + d2.year_end, rt: parseFloat(d2.rt), def_area: parseFloat(d2.def_area) }; })
+                                    values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => { return { 
+                                        label: d2.year_start + '-' + d2.year_end, 
+                                        rt: parseFloat(d2.rt), 
+                                        def_area: parseFloat(d2.def_area),
+                                        degree_in: parseFloat(d2.degree_in),
+                                        degree_out: parseFloat(d2.degree_out),
+                                        betweenness: parseFloat(d2.betweenness),
+                                        closeness: parseFloat(d2.closeness) }; })
                                 };
                             });
                             // Loading information for plots
@@ -235,6 +241,7 @@ function Locality() {
                     </article>
                 </section>
                 <TotalRiskLocality id="trlRisk" datum={d_summary} />
+                <Centrality id="cenMob" datum={d_summary}  />
                 <section className="row">
                     <article className="col-md-12">
                         <h2 className="text-center">Movilización</h2>
@@ -257,7 +264,7 @@ function Locality() {
                     <div className="col-md-4">
                         <DropdownButton id="cboPeriod" title={c_period ? c_period.label : ""}>
                             {list_periods && list_periods.length > 0 ? list_periods.map((item, idx) => (
-                                <Dropdown.Item key={item.start}>{item.label}</Dropdown.Item>
+                                <Dropdown.Item onClick={e => changeCurrentPeriod(item, d_data, c_locality, analysis)} key={item.start}>{item.label}</Dropdown.Item>
                             )) :
                                 ""}
                         </DropdownButton>
