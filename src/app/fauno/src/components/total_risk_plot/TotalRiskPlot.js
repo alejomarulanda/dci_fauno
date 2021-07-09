@@ -8,7 +8,8 @@ import './TotalRiskPlot.css';
 
 function TotalRiskPlot(props) {
     const [options_radar, setOptionsRadar] = React.useState({        
-        xaxis: { categories: ["Riesgo directo", "Riesgo de entrada", "Riesgo de salida"] }
+        xaxis: { categories: ["Riesgo directo", "Riesgo de entrada", "Riesgo de salida"] },
+        yaxis: { min: 0, max:4, forceNiceScale: true}
     });
 
     React.useEffect(() => {        
@@ -26,8 +27,8 @@ function TotalRiskPlot(props) {
                     <Carousel id="carousel_radar">
                         {props.datum_radar ? props.datum_radar.map((item, idx) => (
                             <CarouselItem id={"radar" + idx}>
-                                <h3>{item.period.label}</h3>
-                                <Chart id={"pltFactorRisk_" + idx} options={options_radar} series={item.radar} type="radar" height={500} />                                
+                                <h3 className="text-center">Período {item.period.label}</h3>
+                                <Chart id={"pltFactorRisk_" + idx} options={options_radar} series={item.radar} type="radar" height={450} />                                
                             </CarouselItem>
                         ))
                             : ""

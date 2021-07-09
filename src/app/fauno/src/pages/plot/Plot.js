@@ -105,15 +105,15 @@ function Plot() {
      * @param {*} analysis Current analysis
      */
     function changeCurrentPeriod(e, d_data, m_plot, analysis){
-        /*console.log(e);
+        console.log(e);
         console.log(d_data);
-        console.log(m_plot);
+        /*console.log(m_plot);
         console.log(analysis);*/
         setCPeriod(e);
        
         const d = d_data.filter((d2)=>{ return d2.plot.ext_id === m_plot.ext_id})[0];
-        const m_out_tmp = d.m_out.filter((d2)=>{ return d2.type === analysis.id});
-        const m_in_tmp = d.m_in.filter((d2)=>{ return d2.type === analysis.id});
+        const m_out_tmp = d.m_out.filter((d2)=>{ return d2.type === analysis.id && d2.year_start == e.start});
+        const m_in_tmp = d.m_in.filter((d2)=>{ return d2.type === analysis.id && d2.year_start == e.start});
         
         setDExport(getMobilization(m_out_tmp));
         setDImport(getMobilization(m_in_tmp));
@@ -245,7 +245,7 @@ function Plot() {
                         <div className="col-md-4">
                             <DropdownButton id="cboPeriod" title={c_period ? c_period.label : ""}>                    
                                 {list_periods && list_periods.length > 0 ? list_periods.map((item, idx) => (
-                                    <Dropdown.Item onClick={e => changeCurrentPeriod(item, d_data, m_plot, analysis)} key={item.start}>{item.label}</Dropdown.Item>
+                                    <Dropdown.Item onClick={e => changeCurrentPeriod(item, d_data, c_plot, analysis)} key={item.start}>{item.label}</Dropdown.Item>
                                 )):
                                 ""}
                             </DropdownButton>
