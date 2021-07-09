@@ -7,6 +7,8 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 
 
 import Map from '../../components/map/Map';
+import TotalRiskLocality from '../../components/total_risk_locality/TotalRiskLocality';
+import ImportExport from '../../components/import_export/ImportExport';
 
 import LocalityService from "../../services/LocalityService";
 
@@ -144,7 +146,7 @@ function Locality() {
         // Getting data from API about localities
         LocalityService.search(lo).then(
             (data) => {
-                if (data) {                    
+                if (data) {                          
                     setDData(data);
                     // Getting geojson from mapserver
                     LocalityService.geojson(lo).then(
@@ -155,7 +157,7 @@ function Locality() {
                                 return {
                                     key: d.locality.name,
                                     bar: true,
-                                    values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => { return { label: d2.year_start + '-' + d2.year_end, value_risk: parseFloat(d2.rt), value_def: parseFloat(d2.def_area) }; })
+                                    values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => { return { label: d2.year_start + '-' + d2.year_end, rt: parseFloat(d2.rt), def_area: parseFloat(d2.def_area) }; })
                                 };
                             });
                             // Loading information for plots
@@ -232,29 +234,7 @@ function Locality() {
                         <Map center={map_country.center} zoom={map_country.zoom} geo={map_localities} type={analysis.id} />
                     </article>
                 </section>
-                <section className="row">
-                    <article className="col-md-6">
-                        <h2 className="text-center">Riesgo</h2>
-                        <p className="text-justify">
-                            El siguiente gráfico le permite observar cual ha sido el nivel de riesgo de
-                            los predios de interés a lo largo del tiempo.
-                        </p>
-                        <div id="pltRiskSummary" className="RiskSummary">
-                            <NVD3Chart id="pltRiskSummary" datum={d_summary} type="multiBarChart" showValues="true" x="label" y="value_risk" />
-                        </div>
-                    </article>
-                    <article className="col-md-6">
-                        <h2 className="text-center">Deforestación potencial</h2>
-                        <p className="text-justify">
-                            Las zonas de los predios son representadas como áreas potenciales de influencia, donde posiblemente se puede
-                            ubicar la zonas para actividad de ganadería. La deforetación que se presenta en la siguiente gráfica
-                            se ubica en esas áreas potenciales de los predios.
-                        </p>
-                        <div id="pltDeforestation" className="DeforestationSummary">
-                            <NVD3Chart id="pltDeforestation" datum={d_summary} type="multiBarChart" showValues="true" x="label" y="value_def" />
-                        </div>
-                    </article>
-                </section>
+                <TotalRiskLocality id="trlRisk" datum={d_summary} />
                 <section className="row">
                     <article className="col-md-12">
                         <h2 className="text-center">Movilización</h2>
@@ -288,10 +268,7 @@ function Locality() {
                         <Map center={map_country.center} zoom={map_country.zoom} geo={d_mobilization} type={analysis.id} />
                     </article>
                     <article className="col-md-6">
-                        <h2 className="text-center">Importación</h2>
-                        <NVD3Chart id="pltRiskImport" className="RiskMobilization" datum={d_import} type="multiBarChart" x="label" y="value" />
-                        <h2 className="text-center">Exportación</h2>
-                        <NVD3Chart id="pltRiskExport" className="RiskMobilization" datum={d_export} type="multiBarChart" x="label" y="value" />
+                        <ImportExport id="iexMobilization" import={d_import} export={d_export} />                        
                     </article>
                 </section>
 
