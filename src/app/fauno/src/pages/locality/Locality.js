@@ -10,6 +10,7 @@ import Centrality from '../../components/centrality/Centrality';
 import ImportExport from '../../components/import_export/ImportExport';
 
 import LocalityService from "../../services/LocalityService";
+import CentralityService from "../../services/CentralityService";
 
 //class Locality extends Component {
 function Locality() {
@@ -30,6 +31,7 @@ function Locality() {
     const [d_mobilization, setDMobilization] = React.useState();
 
     const [d_summary, setDSummary] = React.useState([]);
+    const [d_centrality, setDCentrality] = React.useState([]);
     const [d_import, setDImport] = React.useState([]);
     const [d_export, setDExport] = React.useState([]);
 
@@ -145,36 +147,70 @@ function Locality() {
         // Getting data from API about localities
         LocalityService.search(lo).then(
             (data) => {
-                if (data) {                          
+                if (data) {           
                     setDData(data);
                     // Getting geojson from mapserver
                     LocalityService.geojson(lo).then(
                         (data_geo) => {
                             setMapLocalities(data_geo);
-                            // Fixing data for plots about risk                            
-                            const datum_summary = data.map((d) => {
-                                return {
-                                    key: d.locality.name,
-                                    bar: true,
-                                    values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => { return { 
-                                        label: d2.year_start + '-' + d2.year_end, 
-                                        rt: parseFloat(d2.rt), 
-                                        def_area: parseFloat(d2.def_area),
-                                        degree_in: parseFloat(d2.degree_in),
-                                        degree_out: parseFloat(d2.degree_out),
-                                        betweenness: parseFloat(d2.betweenness),
-                                        closeness: parseFloat(d2.closeness) }; })
-                                };
-                            });
-                            // Loading information for plots
-                            setDSummary(datum_summary);
-                            // setting the first locality for the
-                            changeCurrentLocality(localities[0], data);
-                            setLoading(false);
+                            const years = list_periods.map((d2) => { return d2.start; });
+                            CentralityService.search(years).then(
+                                (data_cen)=>{                                    
+                                    // Fixing data for plots about risk                            
+                                    const datum_summary = data.map((d) => {
+                                        return {
+                                            key: d.locality.name,
+                                            
+                                            values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => {                                                 
+                                                return { 
+                                                    label: d2.year_start + '-' + d2.year_end, 
+                                                    year: d2.year_start,
+                                                    rt: parseFloat(d2.rt), 
+                                                    def_area: parseFloat(d2.def_area),
+                                                    degree_in: parseFloat(d2.degree_in),
+                                                    degree_out: parseFloat(d2.degree_in),
+                                                    betweenness: parseFloat(d2.betweenness),
+                                                    closeness: parseFloat(d2.closeness),
+                                                }; })
+                                        };
+                                    });                                    
+                                    const centrality_measures = ["max","min","avg"];                                    
+                                    var datum_centrality = [...datum_summary];
+                                    for(var i = 0; i< centrality_measures.length; i++){
+                                        
+                                        datum_centrality.push(
+                                            {key: centrality_measures[i],
+                                            values: data_cen
+                                                .filter((d2) => { return d2.analysis.type == analysis.id })
+                                                .map((d2) => {
+                                                    return {
+                                                        label: d2.analysis.year_start + '-' + d2.analysis.year_end, 
+                                                        year: d2.analysis.year_start,
+                                                        degree_in: parseFloat(d2.degree_in[centrality_measures[i]]), 
+                                                        degree_out: parseFloat(d2.degree_out[centrality_measures[i]]), 
+                                                        betweenness: parseFloat(d2.betweenness[centrality_measures[i]]), 
+                                                        closeness: parseFloat(d2.closeness[centrality_measures[i]])
+                                                    };})
+                                            })
+                                    }
+                                    // Loading information for plots
+                                    setDSummary(datum_summary);
+                                    setDCentrality(datum_centrality);
+                                    // setting the first locality for the
+                                    changeCurrentLocality(localities[0], data);
+                                    setLoading(false);
+                                },
+                                error => {
+                                    const resMessage = (error.response && error.response.data && error.response.data.message) ||
+                                        error.message || error.toString();
+                                    
+                                    setLoading(false);
+                                });
                         },
                         error => {
                             const resMessage = (error.response && error.response.data && error.response.data.message) ||
                                 error.message || error.toString();
+                            
                             setLoading(false);
                         }
                     );
@@ -241,7 +277,7 @@ function Locality() {
                     </article>
                 </section>
                 <TotalRiskLocality id="trlRisk" datum={d_summary} />
-                <Centrality id="cenMob" datum={d_summary}  />
+                <Centrality id="cenMob" datum={d_centrality}  />
                 <section className="row">
                     <article className="col-md-12">
                         <h2 className="text-center">Movilización</h2>

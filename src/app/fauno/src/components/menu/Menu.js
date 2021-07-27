@@ -31,6 +31,9 @@ const Menu = ({ history }) =>  {
                         <a className="nav-link" href="#/productor">Análisis productor</a>
                     </li>
                     <li className="nav-item">
+                        <a className="nav-link" href="#/datos">Base de datos</a>
+                    </li>
+                    <li className="nav-item">
                         <a className="nav-link" href="#/acercade">Acerca de</a>
                     </li>
                 </ul>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import PlotBar from '../plot_bar/PlotBar';
+import PlotLine from '../plot_line/PlotLine';
 
 function Centrality(props) {
 
@@ -8,41 +8,41 @@ function Centrality(props) {
         <>
             <section className="row">
                 <article className="col-md-6">
-                    <PlotBar id="plbDegreeIn" 
+                    <PlotLine id="plbDegreeIn" 
                         title="Grado nodal de entrada"
                         description="El siguiente gráfico le permite analizar el indicador de centralidad
                         grado nodal de entrada."
                         datum={props.datum}
-                        x="label" 
+                        x="year" 
                         y="degree_in" />
                 </article>
                 <article className="col-md-6">
-                    <PlotBar id="plbDegreeOut" 
+                    <PlotLine id="plbDegreeOut" 
                         title="Grado nodal de salida"
                         description="El siguiente gráfico le permite analizar el indicador de centralidad
                         grado nodal de salida."
                         datum={props.datum}
-                        x="label" 
+                        x="year" 
                         y="degree_out"  />
                 </article>
             </section>
             <section className="row">
                 <article className="col-md-6">
-                    <PlotBar id="plbDegreeBe" 
+                    <PlotLine id="plbDegreeBe" 
                         title="Intermediación"
                         description="El siguiente gráfico le permite analizar el indicador de centralidad
                         Intermediación."
                         datum={props.datum}
-                        x="label" 
+                        x="year" 
                         y="betweenness"  />
                 </article>
                 <article className="col-md-6">
-                    <PlotBar id="plbDegreeCl" 
+                    <PlotLine id="plbDegreeCl" 
                         title="Grado nodal de cercania"
                         description="El siguiente gráfico le permite analizar el indicador de centralidad
                         grado de cercanía."
                         datum={props.datum}
-                        x="label" 
+                        x="year" 
                         y="closeness"  />
                 </article>
             </section>
