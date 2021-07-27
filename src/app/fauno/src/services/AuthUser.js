@@ -1,11 +1,13 @@
 import axios from "axios";
 
+import Configuration from "./Configuration";
+
 const API_URL = "http://localhost:5000/api/v1/";
 
 class AuthUser {
     login(email, password) {
         return axios
-            .post(API_URL + "login", {
+            .post(Configuration.get_api_url() + "login", {
                 email,
                 password
             })

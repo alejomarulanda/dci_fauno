@@ -1,18 +1,18 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/v1/";
+import Configuration from "./Configuration";
 
 class LocalityService {
     list() {
         return axios
-            .get("data/localities/locality.json", {})
+            .get(Configuration.get_localities_file(), {})
             .then(response => {
                 return response.data;
             });
     };
 
     geojson(ids){
-        const url = "http://localhost:8600/geoserver/localities/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=localities:adm&maxFeatures=50&outputFormat=application/json&CQL_FILTER=adm3_id in (" + ids + ")&SRSNAME=EPSG:4326";
+        const url = Configuration.get_geoserver_url()+ "localities/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=localities:adm&maxFeatures=50&outputFormat=application/json&CQL_FILTER=adm3_id in (" + ids + ")&SRSNAME=EPSG:4326";
         return axios.get(url, {})
             .then(response => {
                 return response.data;
@@ -21,7 +21,7 @@ class LocalityService {
 
     search(ids) {
         return axios
-            .get(API_URL + "analysis/locality?ids=" + ids, {})
+            .get(Configuration.get_api_url() + "analysis/locality?ids=" + ids, {})
             .then(response => {
                 return response.data;
             });

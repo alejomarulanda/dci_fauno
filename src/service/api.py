@@ -116,6 +116,9 @@ def get_analysis_periods():
     for a in analysis:
         a_data = {}
         a_data['period'] = str(a.year_start) + "-" + str(a.year_end)
+        a_data['start'] = a.year_start
+        a_data['end'] = a.year_end
+        a_data["type"] = a.type_analysis
 
         result.append(a_data) 
 
