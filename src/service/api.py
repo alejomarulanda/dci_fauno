@@ -175,26 +175,14 @@ def get_analysis_centrality():
 
     # Filtering analysis
     analysis = Analysis.objects(Q(year_start__in = years))
-    #analysis_id = [x.id for x in analysis]
-
-    #risk = LocalityRisk.objects(Q(analysis__in = analysis_id))
     
-    pipeline = [{"$match" : {"analysis" : a.id}},
-                    {"$group": {"analysis": "$analysis", 
-                                "risk_total_max": {"$max": "$risk_total"},
-                                "risk_total_min": {"$min": "$risk_total"},
-                                "risk_total_avg": {"$avg": "$risk_total"},
-                                }}]
-    data = LocalityRisk.objects().aggregate(pipeline)
-    print(data)
     result = []
-    
     for a in analysis:
         
         a_data = {}
 
         a_data["analysis"] = {'year_start':a.year_start, 'year_end':a.year_end, 'type': a.type_analysis }
-
+        
         pipeline = [{"$match" : {"analysis" : a.id}},
                     {"$group": {"_id": 0, 
                                 "rt_max": {"$max": "$risk_total"},
@@ -218,12 +206,12 @@ def get_analysis_centrality():
                                 }}]
         data = LocalityRisk.objects().aggregate(pipeline)
         d = data.next()
-        a_data["risk_total"] = [{"max":d["rt_max"],"min":d["rt_min"],"avg":d["rt_avg"]}]
-        a_data["degree"] = [{"max":d["dg_max"],"min":d["dg_min"],"avg":d["dg_avg"]}]
-        a_data["degree_in"] = [{"max":d["di_max"],"min":d["di_min"],"avg":d["di_avg"]}]
-        a_data["degree_out"] = [{"max":d["do_max"],"min":d["do_min"],"avg":d["do_avg"]}]
-        a_data["betweenness"] = [{"max":d["be_max"],"min":d["be_min"],"avg":d["be_avg"]}]
-        a_data["closeness"] = [{"max":d["cl_max"],"min":d["cl_min"],"avg":d["cl_avg"]}]
+        a_data["risk_total"] = {"max":d["rt_max"],"min":d["rt_min"],"avg":d["rt_avg"]}
+        a_data["degree"] = {"max":d["dg_max"],"min":d["dg_min"],"avg":d["dg_avg"]}
+        a_data["degree_in"] = {"max":d["di_max"],"min":d["di_min"],"avg":d["di_avg"]}
+        a_data["degree_out"] = {"max":d["do_max"],"min":d["do_min"],"avg":d["do_avg"]}
+        a_data["betweenness"] = {"max":d["be_max"],"min":d["be_min"],"avg":d["be_avg"]}
+        a_data["closeness"] = {"max":d["cl_max"],"min":d["cl_min"],"avg":d["cl_avg"]}
         
         result.append(a_data) 
     
