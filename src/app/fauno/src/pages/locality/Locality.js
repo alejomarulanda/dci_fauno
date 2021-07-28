@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import Form from "react-validation/build/form";
 import { DropdownButton, Dropdown } from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
 
 
+import ListLocalities from '../../components/list_localities/ListLocalities';
 import Map from '../../components/map/Map';
 import TotalRiskLocality from '../../components/total_risk_locality/TotalRiskLocality';
 import Centrality from '../../components/centrality/Centrality';
@@ -240,12 +240,9 @@ function Locality() {
                     <div className="form-group row">
                         <label htmlFor="txtLocalities" className="col-sm-2 col-form-label">Veredas:</label>
                         <div className="col-sm-5">
-                            <Typeahead id="example" onChange={setLocalities}
-                                options={list_localities}
-                                placeholder="Cali, el aguacatal"
-                                multiple
-                                selected={localities}
-                                size={"small"} />
+                            <ListLocalities id="txtLocalities" 
+                                list={list_localities} 
+                                onChange={setLocalities} />
                         </div>
                         <label htmlFor="cboTypes" className="col-sm-2 col-form-label">Tipo de análisis:</label>
                         <div className="col-sm-1">

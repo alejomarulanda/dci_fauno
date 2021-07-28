@@ -1,18 +1,37 @@
 import React, { Component } from 'react';
 import Form from "react-validation/build/form";
 import { DropdownButton, Dropdown } from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
 
 import CardData from '../../components/card_data/CardData';
 import Configuration from '../../services/Configuration';
 
+import LocalityService from "../../services/LocalityService";
+
 
 //class Locality extends Component {
 function Data() {
+    const [list_localities, setListLocalities] = React.useState([]);
+    const [localities, setLocalities] = React.useState();
 
+    /**
+     * Method which gets all localities from the localhost
+     */
+     const getLocalities = () => {
+        LocalityService.list().then(
+            (data) => {
+                setListLocalities(data.map((d) => {
+                    return { value: d.loc_ext_id, label: d.adm_name + ', ' + d.loc_name };
+                }));
+            },
+            error => {
+                const resMessage = (error.response && error.response.data && error.response.data.message) ||
+                    error.message || error.toString();
+            }
+        );
+    }
 
     React.useEffect(() => {
-
+        getLocalities();
         return () => undefined;
     }, []);
 
@@ -47,6 +66,8 @@ function Data() {
                 <CardData id="crdAnalysisLocalities" 
                     header="Análisis de vereda"
                     title="Análisis de vereda" 
+                    list_localities={list_localities}
+                    onChange={setLocalities}
                     description="Esta base de datos contiene información sobre los niveles de riesgo e indicadores de
                         centralidad a escala veredal. Esta base de datos tambien ofrece información sobre la movilización
                         de ganado, entre las veredas, especificando el grupo etario."
