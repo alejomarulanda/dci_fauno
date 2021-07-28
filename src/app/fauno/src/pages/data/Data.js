@@ -11,6 +11,7 @@ function Data() {
     const [list_localities, setListLocalities] = React.useState([]);
     const [localities, setLocalities] = React.useState();
     const [years, setYears] = React.useState();
+    const [plots, setPlots] = React.useState();
 
     /**
      * Method which gets all localities from the localhost
@@ -79,7 +80,7 @@ function Data() {
                         sobre los indicadores de centralidad calculados en los diferente períodos."
                     onChangeYears={setYears}
                     list_periods={true}
-                    url={Configuration.get_api_url() + "analysis/centrality?years=" + years }/>
+                    url={Configuration.get_api_url() + "analysis/centrality?years=" +  (years ? years : "") }/>
 
                 <CardData id="crdAnalysisPlots" 
                     header="Análisis de predios"
@@ -87,7 +88,9 @@ function Data() {
                     description="Esta base de datos contiene información sobre los niveles de riesgo y sus componentes
                         de cada predio. Esta base de datos tambien ofrece información sobre la movilización
                         de ganado, entre los predios ganaderos, especificando el grupo etario."
-                    url={Configuration.get_api_url()} />
+                    plots={true}
+                    onChangePlots={setPlots}
+                    url={Configuration.get_api_url() + "analysis/plots?ids=" + (plots ? plots : "")} />
             </div>
 
         </>

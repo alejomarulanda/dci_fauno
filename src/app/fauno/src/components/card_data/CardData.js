@@ -6,7 +6,6 @@ import ListLocalities from '../../components/list_localities/ListLocalities';
 
 function CardData(props) {    
     const [localities, setLocalities] = React.useState();
-    const [years, setYears] = React.useState();
 
     const handleChangeLocalities = event => {        
         props.onChangeLocalities(event);
@@ -14,6 +13,10 @@ function CardData(props) {
 
     const handleChangeYears = event => {  
         props.onChangeYears(event.target.value.trim().replace(" ",""));
+    };
+    
+    const handleChangePlots = event => {  
+        props.onChangePlots(event.target.value.trim().replace(" ",""));
     };
     
     React.useEffect(() => {
@@ -47,7 +50,17 @@ function CardData(props) {
                             <div className="form-group row">
                                 <div className="col-sm-12">
                                     <input id="txtYears" type="text" className="form-control" placeholder="2017, 2018"
-                                        value={years} onChange={handleChangeYears} />
+                                        onChange={handleChangeYears} />
+                                    
+                                </div>
+                            </div>
+                        </div> : ""}
+                    {props.plots ?
+                        <div className="form-horizontal">
+                            <div className="form-group row">
+                                <div className="col-sm-12">
+                                    <input id="txtYears" type="text" className="form-control" placeholder="1057465, 5245454"
+                                        onChange={handleChangePlots} />
                                     
                                 </div>
                             </div>
