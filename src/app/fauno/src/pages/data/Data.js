@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Form from "react-validation/build/form";
-import { DropdownButton, Dropdown } from 'react-bootstrap';
 
 import CardData from '../../components/card_data/CardData';
 import Configuration from '../../services/Configuration';
@@ -12,6 +10,7 @@ import LocalityService from "../../services/LocalityService";
 function Data() {
     const [list_localities, setListLocalities] = React.useState([]);
     const [localities, setLocalities] = React.useState();
+    const [years, setYears] = React.useState();
 
     /**
      * Method which gets all localities from the localhost
@@ -65,20 +64,22 @@ function Data() {
                 
                 <CardData id="crdAnalysisLocalities" 
                     header="Análisis de vereda"
-                    title="Análisis de vereda" 
-                    list_localities={list_localities}
-                    onChange={setLocalities}
+                    title="Análisis de vereda"                     
                     description="Esta base de datos contiene información sobre los niveles de riesgo e indicadores de
                         centralidad a escala veredal. Esta base de datos tambien ofrece información sobre la movilización
                         de ganado, entre las veredas, especificando el grupo etario."
-                    url={Configuration.get_api_url()} />
+                    onChangeLocalities={setLocalities}
+                    list_localities={list_localities}
+                    url={Configuration.get_api_url() + "analysis/locality?ids=" + (localities ? localities.map((d2) => { return d2.value; }) : "") } />
 
                 <CardData id="crdAnalysisCentrality" 
                     header="Indicadores de centralidad"
                     title="Estadísticos de indicadores" 
                     description="Esta base de datos contiene información los valores máximos, mínimos y promedios 
                         sobre los indicadores de centralidad calculados en los diferente períodos."
-                    url={Configuration.get_api_url()} />
+                    onChangeYears={setYears}
+                    list_periods={true}
+                    url={Configuration.get_api_url() + "analysis/centrality?years=" + years }/>
 
                 <CardData id="crdAnalysisPlots" 
                     header="Análisis de predios"

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Form from "react-validation/build/form";
 import Input from "react-validation/build/input";
-import NVD3Chart from 'react-nvd3';
+
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 
 import Map from '../../components/map/Map';

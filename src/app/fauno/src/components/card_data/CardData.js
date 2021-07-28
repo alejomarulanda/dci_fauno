@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
 
+import Input from "react-validation/build/input";
+
 import ListLocalities from '../../components/list_localities/ListLocalities';
 
 function CardData(props) {    
     const [localities, setLocalities] = React.useState();
+    const [years, setYears] = React.useState();
 
-    const handleChange = event => {        
-        props.onChange(event);
+    const handleChangeLocalities = event => {        
+        props.onChangeLocalities(event);
+    };
+
+    const handleChangeYears = event => {  
+        props.onChangeYears(event.target.value.trim().replace(" ",""));
     };
     
     React.useEffect(() => {
@@ -31,7 +38,17 @@ function CardData(props) {
                                 <div className="col-sm-12">
                                     <ListLocalities id="txtLocalities" 
                                         list={props.list_localities} 
-                                        onChange={handleChange} />
+                                        onChange={handleChangeLocalities} />                                    
+                                </div>
+                            </div>
+                        </div> : ""}
+                    {props.list_periods ?
+                        <div className="form-horizontal">
+                            <div className="form-group row">
+                                <div className="col-sm-12">
+                                    <input id="txtYears" type="text" className="form-control" placeholder="2017, 2018"
+                                        value={years} onChange={handleChangeYears} />
+                                    
                                 </div>
                             </div>
                         </div> : ""}
