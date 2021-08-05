@@ -1,25 +1,34 @@
 import sys
-sys.path.insert(1, "D:\\CIAT\\Code\\BID\\dci_fauno\\src\\orm")
-
 from functools import wraps
 import requests
 import datetime
 from flask import Flask, request, jsonify, make_response
 import uuid
 import jwt
-from app_conf import config
 from werkzeug.security import generate_password_hash, check_password_hash
 from mongoengine import *
-from fauno_entities import *
 from mongoengine.queryset.visitor import Q
 from flask_cors import cross_origin#CORS
 
-app = Flask(__name__)
+from app_conf import config
 
+app = Flask(__name__)
 app.config['SECRET_KEY'] = config['SECRET_KEY']
 app.config['MONGO_USER'] = config['MONGO_USER']
 app.config['MONGO_PWD'] = config['MONGO_PWD']
 app.config['MONGO_DB'] = config['MONGO_DB']
+app.config['MONGO_SERVER'] = config['MONGO_SERVER']
+app.config['DEBUG'] = config['DEBUG']
+app.config['ORM_PATH'] = config['ORM_PATH']
+
+sys.path.insert(1, app.config['ORM_PATH'])
+
+
+
+from fauno_entities import *
+
+
+
 
 #cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 #CORS(app)
@@ -272,9 +281,10 @@ def get_analysis_plot():
 
 if __name__ == "__main__":
     
-    connect('fauno_db',username=app.config['MONGO_USER'], password=app.config['MONGO_PWD'], authentication_source='admin', host='localhost', port=27017)
-    app.run(threaded=True, port=5000, debug=True)
-    #app.run(host='0.0.0.0', port=5000)
+    connect(app.config['MONGO_DB'],host=app.config['MONGO_SERVER'],username=app.config['MONGO_USER'], password=app.config['MONGO_PWD'], authentication_source='admin', host='localhost', port=27017)
+    #app.run(threaded=True, port=5000, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=app.config['DEBUG'])
+    #app.run(, port=5000)
 
 # Run in background
 # nohup python3.8 api.py > api.log 2>&1 &
