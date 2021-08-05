@@ -23,12 +23,7 @@ app.config['ORM_PATH'] = config['ORM_PATH']
 
 sys.path.insert(1, app.config['ORM_PATH'])
 
-
-
 from fauno_entities import *
-
-
-
 
 #cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 #CORS(app)
