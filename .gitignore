@@ -17,8 +17,5 @@
 /src/risk_calculator/.ipynb_checkpoints
 */.ipynb_checkpoints/*
 
-# Secrets
-/src/service/app_conf.py
-
 # Test
 /src/service/test.py
