@@ -276,7 +276,7 @@ def get_analysis_plot():
 
 if __name__ == "__main__":
     
-    connect(app.config['MONGO_DB'],host=app.config['MONGO_SERVER'],username=app.config['MONGO_USER'], password=app.config['MONGO_PWD'], authentication_source='admin', host='localhost', port=27017)
+    connect(app.config['MONGO_DB'],host=app.config['MONGO_SERVER'],username=app.config['MONGO_USER'], password=app.config['MONGO_PWD'], authentication_source='admin', port=app.config['MONGO_PORT'])
     #app.run(threaded=True, port=5000, debug=True)
     app.run(host='0.0.0.0', port=80, debug=app.config['DEBUG'])
     #app.run(, port=5000)
