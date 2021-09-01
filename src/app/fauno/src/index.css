@@ -11,3 +11,73 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+h2{
+	color: #165226 !important;
+}
+a.navbar-brand {
+    background: url('imgs/logoGANABOSQUES.png') no-repeat; 
+    width: 30%;
+
+    height: 70px;
+    margin-top: 15px;
+}
+
+
+li.nav-item  a.nav-link {
+ color: #165226 !important;
+ font-weight: bold;
+}
+.navbar {
+background-color: #FFF !important;
+    border: none;
+    margin: auto;
+padding: 0 150px !important;
+}
+
+
+/*slide*/
+
+#slide {
+background: url('imgs/SLIDE1.png') no-repeat; 
+background-position: center;
+height: 70vh;
+
+}
+#letras-slide{
+margin: auto;
+margin-top: 15vh;
+color:white;
+font-weight: 400;
+width: 45vw;
+font-size: 1.55rem;
+}
+
+/*contenidoHOME*/
+#tres-circulos img{
+	width: 50%;
+	margin: 5%;
+}
+#tres-circulos{
+margin: auto;
+}
+
+/*FOOTER*/
+footer{
+	background-color: #175326;
+	color:white;
+	margin: -1px;
+	width: 100%;
+	text-align: center;
+	    padding: 5px;
+
+}
+footer a{
+	color: white;
+}
+footer a:hover{
+	color: #94BF22
+}
+#fondo-footer img{
+	width: 100%;
+}
