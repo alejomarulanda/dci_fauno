@@ -4,7 +4,7 @@ import './Home.css';
 import Circulo1 from '../../imgs/CirculosHOME-1.png'
 import Circulo2 from '../../imgs/CirculosHOME-2.png'
 import Circulo3 from '../../imgs/CirculosHOME-3.png'
-import fondoFOOTER from '../../imgs/fondoFOOTER.png'
+
 
 
 
@@ -49,7 +49,7 @@ class Home extends Component {
 							</p>
 						</div>
 					</div>
-					<div id="fondo-footer"><img src={fondoFOOTER} /> </div>
+					
 				</div>
 			</>
 		)

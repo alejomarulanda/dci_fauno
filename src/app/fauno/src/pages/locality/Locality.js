@@ -12,6 +12,7 @@ import ImportExport from '../../components/import_export/ImportExport';
 import LocalityService from "../../services/LocalityService";
 import CentralityService from "../../services/CentralityService";
 
+
 //class Locality extends Component {
 function Locality() {
     const [list_localities, setListLocalities] = React.useState([]);
@@ -225,35 +226,34 @@ function Locality() {
     }
 
     return (
-        <>
-            <div className="container-fluid">
-                <h1 className="text-center">Análisis por vereda</h1>
-                <p className="text-justify">
-                    En esta página usted podrá encontrar los resultados de análisis de riesgo de
-                    deforestación asociado a ganadería al nivel de nacional por cada vereda.
-                    Primero deberá seleccionar las veredas que desea analizar, luego podrá
-                    seleccionar el tipo de análisis que desea revisar.
-                    Actualmente se cuenta con dos tipos de análisis: Anual y Acumulado.
-                </p>
+            
 
-                <Form ref={c => { setForm(c); }} onSubmit={handleSearchLocality} >
+            <div id="containerpages">
+                <div className="container pages">
+
+                    <section className="row" id="headerpages">
+                    <article className="col-md-5">
+                
+                    <Form ref={c => { setForm(c); }} onSubmit={handleSearchLocality} >
                     <div className="form-group row">
-                        <label htmlFor="txtLocalities" className="col-sm-2 col-form-label">Veredas:</label>
-                        <div className="col-sm-5">
+                        <label htmlFor="txtLocalities" className="col-sm-6 col-form-label">Veredas:</label>
+                        <div className="col-sm-6">
                             <ListLocalities id="txtLocalities" 
                                 list={list_localities} 
                                 onChange={setLocalities} />
                         </div>
-                        <label htmlFor="cboTypes" className="col-sm-2 col-form-label">Tipo de análisis:</label>
-                        <div className="col-sm-1">
-                            <DropdownButton id="cboAnalysis" title={analysis.label}>
+
+                        <label htmlFor="cboTypes" className="col-sm-6 col-form-label">Tipo de análisis:</label>
+                        <div className="col-sm-3">
+                            <DropdownButton  id="cboAnalysis" title={analysis.label}>
                                 {list_analysis.map((item, idx) => (
                                     <Dropdown.Item onClick={e => setAnalysis(item)} key={item.id}>{item.label}</Dropdown.Item>
                                 ))}
                             </DropdownButton>
                         </div>
-                        <div className="col-sm-2">
-                            <button className="w-100 btn btn-lg btn-primary" disabled={loading}>
+
+                        <div className="col-sm-3">
+                            <button className="w-100 btn btn-primary" disabled={loading}>
                                 {loading && (
                                     <span className="spinner-border spinner-border-sm"></span>
                                 )}
@@ -261,20 +261,41 @@ function Locality() {
                             </button>
                         </div>
                     </div>
-                </Form>
-                <section className="row">
+                    </Form>
+                    
+                    </article>
+
+                    <article className="col-md-7">        
+                    <p className="text-justify" id="textoheaderpage">
+                    <b>Análisis por vereda:</b> En esta página usted podrá encontrar los resultados de análisis de riesgo de
+                    deforestación asociado a ganadería al nivel de nacional por cada vereda.
+                    Primero deberá seleccionar las veredas que desea analizar, luego podrá
+                    seleccionar el tipo de análisis que desea revisar.
+                    Actualmente se cuenta con dos tipos de análisis: Anual y Acumulado.
+                    </p>
+                    </article>
+
+                    </section>
+
+
+
+
+
+                    <section className="row" id="ubicacion">
                     <article className="col-md-12">
-                        <h2 className="text-center">Ubicación</h2>
-                        <p className="text-justify">
-                            En el siguiente mapa usted podrá observar dondé se encuentran ubicados los
+                        
+                        <p className="text-justify parrafo-ubicacion">
+                            <b>Ubicación: </b>En el siguiente mapa usted podrá observar dondé se encuentran ubicados los
                             predios de ganadería, tambien podrá observar cual es el área potencial
                             con el que se ha realizado el último análisis de riesgo.
                         </p>
                         <Map center={map_country.center} zoom={map_country.zoom} geo={map_localities} type={analysis.id} />
                     </article>
                 </section>
+
                 <TotalRiskLocality id="trlRisk" datum={d_summary} />
                 <Centrality id="cenMob" datum={d_centrality}  />
+                
                 <section className="row">
                     <article className="col-md-12">
                         <h2 className="text-center">Movilización</h2>
@@ -313,7 +334,7 @@ function Locality() {
                 </section>
 
             </div>
-        </>
+            </div>
     )
 
 

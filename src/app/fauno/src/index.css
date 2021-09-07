@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #F7F7F8 !important;
 }
 
 code {
@@ -63,21 +64,82 @@ margin: auto;
 }
 
 /*FOOTER*/
-footer{
+#fondo-footer{
 	background-color: #175326;
 	color:white;
 	margin: -1px;
 	width: 100%;
 	text-align: center;
-	    padding: 5px;
+	padding: 5px;
 
 }
-footer a{
+#fondo-footer a{
 	color: white;
 }
-footer a:hover{
+#footer a:hover{
 	color: #94BF22
 }
-#fondo-footer img{
+
+footer img {
 	width: 100%;
+}
+
+
+
+/*SUBPAGINAS VEREDA Y PRODUCTORES*/
+#headerpages{
+	padding-top: 50px;
+}
+#headerpages button{
+background-color:#16522A;
+}
+#headerpages #cboAnalysis{
+background-color: white;
+color:#16522A;
+border: 1px solid #ced4da;
+width: 100%;
+}
+#headerpages b{
+color:#16522A;
+}
+#textoheaderpage{
+	font-size: 1em;
+}
+#headerpages input{
+	margin-bottom: 5px;
+}
+
+#ubicacion{
+	margin-top: 50px;
+}
+
+
+#containerpages{
+	background-color: #F7F7F8;
+}
+.container.pages{
+	padding: 0 !important;
+}
+.parrafo-ubicacion{
+	background-color: #EAEAEB;
+	margin: 0;
+    padding: 20px;
+}
+.container.pages .basededatos-descripcion{
+	padding-top: 50px;
+}
+
+/*base de datos pages*/
+.card-basededatos{
+	margin-top: 20px;
+}
+.card-title{
+	color:#16522A;
+}
+.card a {
+	color:#99C21C;
+}
+.card {
+	background-color: transparent;
+	border:none;
 }

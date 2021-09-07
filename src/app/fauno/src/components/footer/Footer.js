@@ -4,9 +4,14 @@ class Footer extends Component {
 
     render() {
         return (
-            <footer >
+            		<footer >
+            		
+      				<img src="images/footer-con-logo.png" alt=""/>
+    				
+                    <div id="fondo-footer">
                     &copy; 2021 Alliance Bioversity International - CIAT - <a href="#">Política de Privacidad</a> - <a href="#">Términos y condiciones</a>
-            </footer>
+                    </div>
+            		</footer>
         );
     }
 
