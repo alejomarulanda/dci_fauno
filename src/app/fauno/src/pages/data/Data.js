@@ -38,23 +38,35 @@ function Data() {
 
 
     return (
-        <>
-            <div className="container-fluid">
-                <h1 className="text-center">Base de datos</h1>
-                <p className="text-justify">
-                    En esta página usted podrá acceder a los resultados de análisis de riesgo de
-                    deforestación asociado a ganadería, tanto a nivel de nacional por cada vereda,
-                    como a nivel predial (si cuenta con la autorización necesaria).
-                </p>
+        <div id="containerpages">
+                <div className="container pages">
 
+                <p className="text-justify basededatos-descripcion" id="textoheaderpage">
+                    <b>Base de datos:</b> En esta página usted podrá acceder a los resultados de análisis de riesgo de
+                    deforestación asociado a ganadería, tanto a nivel de nacional por cada vereda,
+                    como a nivel predial.* 
+                   <p><i>*(si cuenta con la autorización necesaria).</i></p>
+                    </p>
+
+        <div className="row card-basededatos">
+            <div className="col-md-3">
+            <img src="images/icon-listaveredas.png" alt=""/>
+            </div>
+            <div className="col-md-9">
                 <CardData id="crdLocality" 
-                    header="Veredas"
                     title="Listado de veredas" 
                     description="Esta base de datos contiene información sobre las veredas
                         que se encuentran disponibles con los resultados de los análisis que se ofrecen en la plataforma.
                         Es necesaria para poder establecer la relación con otras base de datos de esta plataforma."
                     url={Configuration.get_api_url() + "locality"} />
-
+            </div>
+        </div>
+    
+        <div className="row card-basededatos">
+            <div className="col-md-3">
+            <img src="images/icon-periodoanalisis.png" alt=""/>
+            </div>
+            <div className="col-md-9">
                 <CardData id="crdPeriods" 
                     header="Períodos"
                     title="Períodos de análisis" 
@@ -62,7 +74,14 @@ function Data() {
                         en los cuales se han realizado análisis de riesgo.
                         Es necesaria para poder establecer la relación con otras base de datos de esta plataforma."
                     url={Configuration.get_api_url() + "analysis/periods"} />
-                
+            </div>
+        </div>
+
+        <div className="row card-basededatos">
+            <div className="col-md-3">
+            <img src="images/icon-analisisvereda.png" alt=""/>
+            </div>
+            <div className="col-md-9">       
                 <CardData id="crdAnalysisLocalities" 
                     header="Análisis de vereda"
                     title="Análisis de vereda"                     
@@ -72,7 +91,14 @@ function Data() {
                     onChangeLocalities={setLocalities}
                     list_localities={list_localities}
                     url={Configuration.get_api_url() + "analysis/locality?ids=" + (localities ? localities.map((d2) => { return d2.value; }) : "") } />
+            </div>
+        </div>
 
+        <div className="row card-basededatos">
+            <div className="col-md-3">
+            <img src="images/icon-indicadores.png" alt=""/>
+            </div>
+            <div className="col-md-9"> 
                 <CardData id="crdAnalysisCentrality" 
                     header="Indicadores de centralidad"
                     title="Estadísticos de indicadores" 
@@ -81,7 +107,14 @@ function Data() {
                     onChangeYears={setYears}
                     list_periods={true}
                     url={Configuration.get_api_url() + "analysis/centrality?years=" +  (years ? years : "") }/>
+            </div>
+        </div>
 
+        <div className="row card-basededatos">
+            <div className="col-md-3">
+            <img src="images/icon-indicadores.png" alt=""/>
+            </div>
+            <div className="col-md-9"> 
                 <CardData id="crdAnalysisPlots" 
                     header="Análisis de predios"
                     title="Indicadores de riesgo de predios" 
@@ -92,8 +125,12 @@ function Data() {
                     onChangePlots={setPlots}
                     url={Configuration.get_api_url() + "analysis/plots?ids=" + (plots ? plots : "")} />
             </div>
+        </div>
 
-        </>
+
+            </div>
+
+        </div>
     )
 
 
