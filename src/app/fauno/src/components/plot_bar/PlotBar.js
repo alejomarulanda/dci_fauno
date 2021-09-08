@@ -8,7 +8,7 @@ function PlotBar(props) {
     return (
         <>
             <h2 className="text-center">{props.title}</h2>
-            <p className="text-justify">
+            <p className="text-center">
                 {props.description}
             </p>
             <div id="pltRiskSummary" className="PlotBarPlot">
