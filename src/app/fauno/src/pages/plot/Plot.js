@@ -174,34 +174,33 @@ function Plot() {
     }
 
     return (
-        <>
-            <div className="container-fluid">
-                <h1 className="text-center">Análisis por productor</h1>
-                <p className="text-justify">
-                    En esta página usted podrá encontrar los resultados de análisis de riesgo de
-                    deforestación asociado a ganadería al nivel de nacional por cada productor.
-                    Primero deberá ingresar los identificadores de los productores que desea
-                    analizar, luego podrá seleccionar el tipo de análisis que desea revisar.
-                    Actualmente se cuenta con dos tipos de análisis: Anual y Acumulado.
-                </p>
+        
+                
+            <div id="containerpages">
+                <div className="container pages">
 
+                    <section className="row" id="headerpages">
+                    <article className="col-md-5">
+                            
                 <Form ref={c => { setForm(c); }} onSubmit={handleSearchPlots} >
                     <div className="form-group row">
-                        <label htmlFor="txtPlots" className="col-sm-2 col-form-label">Listado de productores:</label>
-                        <div className="col-sm-5">
+                        <label htmlFor="txtPlots" className="col-sm-6 col-form-label">Listado de productores:</label>
+                        <div className="col-sm-6">
                             <Input type="text" className="form-control" id="txtPlots" placeholder="1020, 854753"
                                 value={plots} onChange={onChangePlots} />
                         </div>
-                        <label htmlFor="cboTypes" className="col-sm-2 col-form-label">Tipo de análisis:</label>
-                        <div className="col-sm-1">
+
+                        <label htmlFor="cboTypes" className="col-sm-6 col-form-label">Tipo de análisis:</label>
+                        <div className="col-sm-3">
                             <DropdownButton id="cboAnalysis" title={analysis.label}>                    
                                 {list_analysis.map((item, idx) => (
                                     <Dropdown.Item onClick={e => setAnalysis(item)} key={item.id}>{item.label}</Dropdown.Item>
                                 ))}
                             </DropdownButton>
                         </div>
-                        <div className="col-sm-2">
-                            <button className="w-100 btn btn-lg btn-primary" disabled={loading}>
+
+                        <div className="col-sm-3">
+                            <button className="w-100 btn btn-primary" disabled={loading}>
                                 {loading && (
                                     <span className="spinner-border spinner-border-sm"></span>
                                 )}
@@ -210,11 +209,29 @@ function Plot() {
                         </div>
                     </div>
                 </Form>
+
+                </article>
+
+                <article className="col-md-7">        
+                <p className="text-justify" id="textoheaderpage">
+                    <b>Análisis por productor: </b>En esta página usted podrá encontrar los resultados de análisis de riesgo de
+                    deforestación asociado a ganadería al nivel de nacional por cada productor.
+                    Primero deberá ingresar los identificadores de los productores que desea
+                    analizar, luego podrá seleccionar el tipo de análisis que desea revisar.
+                    Actualmente se cuenta con dos tipos de análisis: Anual y Acumulado.
+                </p>
+                </article>
+
+                </section>
+
+
+
+
                 <section className="row">
                     <article className="col-md-12">
-                        <h2 className="text-center">Ubicación</h2>
-                        <p className="text-justify">
-                            En el siguiente mapa usted podrá observar dondé se encuentran ubicados los
+                    
+                        <p className="text-justify parrafo-ubicacion">
+                            <b>Ubicación: </b>En el siguiente mapa usted podrá observar dondé se encuentran ubicados los
                             predios de ganadería, tambien podrá observar cual es el área potencial
                             con el que se ha realizado el último análisis de riesgo.
                         </p>
@@ -261,7 +278,7 @@ function Plot() {
                 </section>
 
             </div>
-        </>
+        </div>
     )
 
 
