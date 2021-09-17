@@ -4,6 +4,8 @@ import { Carousel, CarouselItem } from 'react-bootstrap';
 
 import PlotBar from '../plot_bar/PlotBar';
 
+import './TotalRiskPlot.css';
+
 function TotalRiskPlot(props) {
     const [options_radar, setOptionsRadar] = React.useState({        
         xaxis: { categories: ["Riesgo directo", "Riesgo de entrada", "Riesgo de salida"] },
@@ -17,16 +19,16 @@ function TotalRiskPlot(props) {
     return (
         <>
             <section className="row">
-                <article className="col-md-6">
+                <article className="col-md-12">
                     <h2 className="text-center">Factores de riesgo</h2>
-                    <p className="text-justify">
+                    <p className="text-center">
                         El siguiente gráfico le permite observar cuales son los factores que han influido
                         en el riesgo de cada sitio.
                     </p>
                     <Carousel id="carousel_radar">
                         {props.datum_radar ? props.datum_radar.map((item, idx) => (
                             <CarouselItem id={"radar" + idx}>
-                                <h3 className="text-center">Período {item.period.label}</h3>
+                                <h5 className="text-center">Período {item.period.label}</h5>
                                 <Chart id={"pltFactorRisk_" + idx} options={options_radar} series={item.radar} type="radar" height={450} />                                
                             </CarouselItem>
                         ))
@@ -34,7 +36,7 @@ function TotalRiskPlot(props) {
                         }
                     </Carousel>
                 </article>
-                <article className="col-md-6">
+                <article className="col-md-12">
                     <PlotBar id="plbRisk" 
                         title="Riesgo total"
                         description="El siguiente gráfico le permite observar cual es el riesgo total de cada sitio."

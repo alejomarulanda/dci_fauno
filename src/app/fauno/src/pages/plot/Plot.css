@@ -9,3 +9,15 @@
 .DeforestationSummary svg{
     height: 500px;
 }
+
+.btn {
+    color: #fff;
+    background-color: #16522A;
+    border-color: #007bff;
+}
+.btn:hover {
+    background-color: #94BF22 !important;
+}
+#movilizacion{
+    margin-bottom: 20px;
+}

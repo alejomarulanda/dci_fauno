@@ -7,7 +7,7 @@ function TotalRiskLocality(props) {
     return (
         <>
             <section className="row">
-                <article className="col-md-6">
+                <article className="col-md-12">
                     <PlotBar id="plbDeforestation" 
                         title="Deforestación potencial"
                         description="La deforetación que se presenta en la siguiente gráfica se ubica en las áreas potenciales de los predios
@@ -17,7 +17,7 @@ function TotalRiskLocality(props) {
                         x="label" 
                         y="def_area"  />
                 </article>
-                <article className="col-md-6">
+                <article className="col-md-12">
                     <PlotBar id="plbRisk" 
                         title="Riesgo total"
                         description="El siguiente gráfico le permite observar cual ha sido el nivel de riesgo total de

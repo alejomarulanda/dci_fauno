@@ -238,17 +238,20 @@ function Plot() {
                         <Map center={map_country.center} zoom={map_country.zoom} buffers_main={map_plots} type={analysis.id} />
                     </article>                    
                 </section>
+
                 <DirectRisk id="comDirectRisk" datum={d_summary} />
+
                 <TotalRiskPlot id="comTotalRisk" datum={d_summary} datum_radar={d_radar}/>
-                <section className="row">
+
+                <section className="row" >
                     <article className="col-md-12">
                         <h2 className="text-center">Movilización</h2>
-                        <p className="text-justify">
+                        <p className="text-center">
                             En esta sección se puede analizar la información correspondiente los movimientos de ganadería realizados por los predios                            
                         </p>
                     </article>                                        
                 </section>
-                <div className="row">
+                <div className="row" id="movilizacion">
                         <label htmlFor="cboPlot" className="col-md-2 col-form-label">Predio:</label>
                         <div className="col-md-4">
                             <DropdownButton id="cboPlot" title={c_plot.ext_id}>                    
