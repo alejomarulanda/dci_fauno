@@ -7,7 +7,7 @@ function Authorize(Component) {
         if (isAuth) {
             return <Component />;
         } else {
-            return <Redirect to="/" />;
+            return <Redirect to="/restringido" />;
         }
     };
 
