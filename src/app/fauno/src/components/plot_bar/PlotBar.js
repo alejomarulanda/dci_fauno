@@ -17,7 +17,7 @@ function PlotBar(props) {
                     showValues="true"
                     x={props.x}
                     y={props.y}
-                    forceY={props.forceY ? props.forceY : undefined}
+                    forceY={props.forceY ? props.forceY : undefined}                    
                 />
             </div>
         </>
