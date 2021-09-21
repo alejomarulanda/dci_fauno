@@ -2,8 +2,6 @@ import axios from "axios";
 
 import Configuration from "./Configuration";
 
-const API_URL = "http://localhost:5000/api/v1/";
-
 class AuthUser {
     login(email, password) {
         return axios
@@ -29,8 +27,8 @@ class AuthUser {
         return !!localStorage.getItem("token");
     }
 
-    getCurrentUser() {
-        return JSON.parse(localStorage.getItem('user'));
+    getCurrentUser() {        
+        return localStorage.getItem('user');
     }
 }
 
