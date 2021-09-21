@@ -105,10 +105,6 @@ function Plot() {
      * @param {*} analysis Current analysis
      */
     function changeCurrentPeriod(e, d_data, m_plot, analysis){
-        console.log(e);
-        console.log(d_data);
-        /*console.log(m_plot);
-        console.log(analysis);*/
         setCPeriod(e);
        
         const d = d_data.filter((d2)=>{ return d2.plot.ext_id === m_plot.ext_id})[0];
