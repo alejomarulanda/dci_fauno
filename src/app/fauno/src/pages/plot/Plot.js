@@ -4,6 +4,7 @@ import Input from "react-validation/build/input";
 
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 
+import Authorize from '../../components/authorize/Authorize';
 import Map from '../../components/map/Map';
 import DirectRisk from '../../components/direct_risk/DirectRisk';
 import TotalRiskPlot from '../../components/total_risk_plot/TotalRiskPlot';
@@ -284,4 +285,4 @@ function Plot() {
 
 }
 
-export default Plot;
+export default Authorize(Plot);
