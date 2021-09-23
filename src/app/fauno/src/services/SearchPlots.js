@@ -1,13 +1,11 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/v1/";
+import Configuration from "./Configuration";
 
 class SearchPlots {
     search(plots_list) {
         return axios
-            .get(API_URL + "analysis/plots?ids=" + plots_list, {
-                
-            })
+            .get(Configuration.get_api_url() + "analysis/plots?ids=" + plots_list, {headers: Configuration.get_aut_header()})
             .then(response => {
                 return response.data;
             });

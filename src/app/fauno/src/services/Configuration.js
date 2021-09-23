@@ -13,6 +13,17 @@ class Configuration {
     get_localities_file() {
         return LOCALITIES_FILE;
     }
+    get_aut_header() {
+        const token = JSON.parse(localStorage.getItem('token'));
+        //console.log(token)
+        if (token) {
+          //return { Authorization: 'Bearer ' + token };
+          console.log(token);
+          return {'x-access-token': token };
+        } else {
+          return {};
+        }
+      }
 
 }
 
