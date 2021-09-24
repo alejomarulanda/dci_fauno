@@ -12,6 +12,8 @@ import Locality from './pages/locality/Locality';
 import Plot from './pages/plot/Plot';
 import Data from './pages/data/Data';
 import Forbidden from './pages/forbidden/Forbidden';
+import Privacy from './pages/privacy/Privacy';
+import Terms from './pages/terms/Terms';
 
 import './App.css';
 
@@ -32,6 +34,8 @@ class App extends Component {
               <Route path='/datos' component={Data} />
               <Route path='/acercade' component={About} />
               <Route path='/restringido' component={Forbidden} />
+              <Route path='/politica' component={Privacy} />
+              <Route path='/terminos' component={Terms} />
               
             </Switch>
           </div>
