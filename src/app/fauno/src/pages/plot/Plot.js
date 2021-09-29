@@ -4,6 +4,7 @@ import Input from "react-validation/build/input";
 
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 
+import Authorize from '../../components/authorize/Authorize';
 import Map from '../../components/map/Map';
 import DirectRisk from '../../components/direct_risk/DirectRisk';
 import TotalRiskPlot from '../../components/total_risk_plot/TotalRiskPlot';
@@ -105,10 +106,6 @@ function Plot() {
      * @param {*} analysis Current analysis
      */
     function changeCurrentPeriod(e, d_data, m_plot, analysis){
-        console.log(e);
-        console.log(d_data);
-        /*console.log(m_plot);
-        console.log(analysis);*/
         setCPeriod(e);
        
         const d = d_data.filter((d2)=>{ return d2.plot.ext_id === m_plot.ext_id})[0];
@@ -288,4 +285,4 @@ function Plot() {
 
 }
 
-export default Plot;
+export default Authorize(Plot);

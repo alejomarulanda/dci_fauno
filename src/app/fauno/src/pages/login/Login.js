@@ -19,7 +19,7 @@ const required = value => {
     }
 };
 
-function Login() {
+function Login(props) {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [form, setForm] = React.useState();
@@ -46,9 +46,7 @@ function Login() {
             AuthUser.login(email, password).then(
                 () => {
                     setLoading(false);
-                    //push("/user");
-                    //window.location.reload();
-                    return <Redirect to='/usuario' />
+                    props.history.push("/usuario");
                 },
                 error => {
                     const resMessage = (error.response && error.response.data && error.response.data.message) ||

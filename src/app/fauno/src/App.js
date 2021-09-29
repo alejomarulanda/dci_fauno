@@ -11,6 +11,7 @@ import User from './pages/user/User';
 import Locality from './pages/locality/Locality';
 import Plot from './pages/plot/Plot';
 import Data from './pages/data/Data';
+import Forbidden from './pages/forbidden/Forbidden';
 
 import './App.css';
 
@@ -30,6 +31,7 @@ class App extends Component {
               <Route path='/vereda' component={Locality} />
               <Route path='/datos' component={Data} />
               <Route path='/acercade' component={About} />
+              <Route path='/restringido' component={Forbidden} />
               
             </Switch>
           </div>

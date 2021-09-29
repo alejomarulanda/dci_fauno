@@ -18,8 +18,10 @@ app.config['MONGO_USER'] = config['MONGO_USER']
 app.config['MONGO_PWD'] = config['MONGO_PWD']
 app.config['MONGO_DB'] = config['MONGO_DB']
 app.config['MONGO_SERVER'] = config['MONGO_SERVER']
+app.config['MONGO_PORT'] = config['MONGO_PORT']
 app.config['DEBUG'] = config['DEBUG']
 app.config['ORM_PATH'] = config['ORM_PATH']
+app.config['PORT'] = config['PORT']
 
 sys.path.insert(1, app.config['ORM_PATH'])
 
@@ -31,18 +33,22 @@ from fauno_entities import *
 def token_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
-        print(request)
         token = None
-
-        if 'x-access-tokens' in request.headers:
-            token = request.headers['x-access-tokens']
-
+        
+        headers = [h for h in request.headers if h[0].lower() == 'x-access-token']
+        if len(headers) > 0:
+            token = headers[0][1]
+                
         if not token:
             return jsonify({'message': 'a valid token is missing'})
 
         try:
-            data = jwt.decode(token, app.config["SECRET_KEY"])
-            current_user = User.objects.get(public_id=data['public_id'])
+            data = jwt.decode(token, app.config["SECRET_KEY"],algorithms=["HS256"])            
+            current_user = User.objects.get(public_id=data['public_id'])            
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Signature expired. Please log in again.'})
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Invalid token. Please log in again.'})
         except:
             return jsonify({'message': 'token is invalid'})
 
@@ -55,6 +61,7 @@ def home():
     return '<h1>Running Fauno API</h1>'
 
 @app.route('/api/v1/register', methods=['GET', 'POST'])
+@cross_origin()
 @token_required
 def signup_user():  
     data = request.get_json()  
@@ -82,7 +89,7 @@ def login_user():
         return make_response('Could not verify',401,{'WWW-Authenticate' : 'Basic realm ="User does not exist !!"'})
      
     if check_password_hash(user.password, auth.get("password")):  
-        token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(days=1)}, app.config['SECRET_KEY'])        
+        token = jwt.encode({'public_id': str(user.public_id), 'exp' : datetime.datetime.utcnow() + datetime.timedelta(days=1)}, app.config['SECRET_KEY'],algorithm="HS256")
         return jsonify({'token' : token}) 
 
     return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
@@ -225,9 +232,9 @@ def get_analysis_centrality():
     return jsonify(result)
 
 @app.route('/api/v1/analysis/plots',methods=['GET'])
-#@token_required
 @cross_origin()
-def get_analysis_plot():
+@token_required
+def get_analysis_plot(current_user):
     # Getting list of all plots requeste
     ids = request.args.get("ids").split(',')
 
@@ -275,10 +282,9 @@ def get_analysis_plot():
     
 
 if __name__ == "__main__":
-    
     connect(app.config['MONGO_DB'],host=app.config['MONGO_SERVER'],username=app.config['MONGO_USER'], password=app.config['MONGO_PWD'], authentication_source='admin', port=app.config['MONGO_PORT'])
     #app.run(threaded=True, port=5000, debug=True)
-    app.run(host='0.0.0.0', port=80, debug=app.config['DEBUG'])
+    app.run(host='0.0.0.0', port=app.config['PORT'], debug=app.config['DEBUG'])
     #app.run(, port=5000)
 
 # Run in background

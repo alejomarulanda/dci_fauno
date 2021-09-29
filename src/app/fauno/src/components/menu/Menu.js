@@ -2,29 +2,26 @@ import React from 'react';
 
 import AuthUser from '../../services/AuthUser';
 
-const Menu = ({ history }) =>  {
-    const [isAuth, setIsAuth] = React.useState();
-
-    React.useEffect(() => {
-        setIsAuth(AuthUser.isLogged());
+function Menu (props) {    
+    
+    React.useEffect(() => {                
         return () => undefined;
     }, []);
 
     const logout = () => {
         AuthUser.logout();
-        setIsAuth(AuthUser.isLogged());
-        //history.push("/");
-      };
+        //props.history.push("/login");
+    };
 
     return (
-      
-<nav className="navbar navbar-dark sticky-top bg-dark navbar-expand-md p-0 ">
+
+        <nav className="navbar navbar-dark sticky-top bg-dark navbar-expand-md p-0 ">
             <a className="navbar-brand" href="#"></a>
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
             </button>
             <div className="collapse navbar-collapse" id="navbarCollapse">
-                <ul className="navbar-nav mr-auto">                                       
+                <ul className="navbar-nav mr-auto">
                     <li className="nav-item">
                         <a className="nav-link" href="#/vereda">Análisis vereda</a>
                     </li>
@@ -41,14 +38,14 @@ const Menu = ({ history }) =>  {
                 <div className="d-flex">
                     <ul className="navbar-nav mr-auto">
 
-                        {!isAuth ? (
+                        {!AuthUser.isLogged() ? (
                             <li className="nav-item">
                                 <a className="nav-link" href="#/login">Iniciar sesión</a>
                             </li>
                         ) : (
                             <div>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="#/usuario">Hola, </a>
+                                    <a className="nav-link" href="#/usuario">Hola, {AuthUser.getCurrentUser()}</a>
                                 </li>
                                 <li className="nav-item">
                                     <a className="nav-link" href="#" onClick={logout}>Cerrar sesión</a>
