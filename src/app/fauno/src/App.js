@@ -14,6 +14,7 @@ import Data from './pages/data/Data';
 import Forbidden from './pages/forbidden/Forbidden';
 import Privacy from './pages/privacy/Privacy';
 import Terms from './pages/terms/Terms';
+import National from './pages/national/National';
 
 import './App.css';
 
@@ -30,6 +31,7 @@ class App extends Component {
               <Route path='/login' component={Login} />
               <Route path='/usuario' component={User} />
               <Route path='/productor' component={Plot} />
+              <Route path='/nacional' component={National} />
               <Route path='/vereda' component={Locality} />
               <Route path='/datos' component={Data} />
               <Route path='/acercade' component={About} />
