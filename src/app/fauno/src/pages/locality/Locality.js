@@ -103,17 +103,17 @@ function Locality() {
      * @param {*} m_locality Current locality
      * @param {*} analysis Current analysis
      */
-     function changeCurrentPeriod(e, d_data, m_locality, analysis){
+    function changeCurrentPeriod(e, d_data, m_locality, analysis) {
         /*console.log(e);
         console.log(d_data);
         console.log(m_locality);
         console.log(analysis);*/
         setCPeriod(e);
-       
-        const d = d_data.filter((d2)=>{ return d2.locality.ext_id === m_locality.value})[0];
-        const m_out_tmp = d.m_out.filter((d2)=>{ return d2.type === analysis.id && d2.year_start == e.start});
-        const m_in_tmp = d.m_in.filter((d2)=>{ return d2.type === analysis.id && d2.year_start == e.start});
-        
+
+        const d = d_data.filter((d2) => { return d2.locality.ext_id === m_locality.value })[0];
+        const m_out_tmp = d.m_out.filter((d2) => { return d2.type === analysis.id && d2.year_start == e.start });
+        const m_in_tmp = d.m_in.filter((d2) => { return d2.type === analysis.id && d2.year_start == e.start });
+
         setDExport(getMobilization(m_out_tmp));
         setDImport(getMobilization(m_in_tmp));
     }
@@ -124,14 +124,14 @@ function Locality() {
      * @param {*array mobilization} mob_tmp 
      * @returns Array of plots for NDV3
      */
-     function getMobilization(mob_tmp){
-        var mob = []; 
-        for(var i = 0; i< mob_tmp.length; i++){
+    function getMobilization(mob_tmp) {
+        var mob = [];
+        for (var i = 0; i < mob_tmp.length; i++) {
             mob.push({
-                    key: mob_tmp[i].locality_reference.name,
-                    bar: true,
-                    values: mob_tmp[i].exchange.map((d2) => { return { label: d2.label, value: parseFloat(d2.amount) }; })
-                });
+                key: mob_tmp[i].locality_reference.name,
+                bar: true,
+                values: mob_tmp[i].exchange.map((d2) => { return { label: d2.label, value: parseFloat(d2.amount) }; })
+            });
         }
         return mob;
     }
@@ -148,7 +148,7 @@ function Locality() {
         // Getting data from API about localities
         LocalityService.search(lo).then(
             (data) => {
-                if (data) {           
+                if (data) {
                     setDData(data);
                     // Getting geojson from mapserver
                     LocalityService.geojson(lo).then(
@@ -156,42 +156,45 @@ function Locality() {
                             setMapLocalities(data_geo);
                             const years = list_periods.map((d2) => { return d2.start; });
                             CentralityService.search(years).then(
-                                (data_cen)=>{                                    
+                                (data_cen) => {
                                     // Fixing data for plots about risk                            
                                     const datum_summary = data.map((d) => {
                                         return {
                                             key: d.locality.name,
-                                            
-                                            values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => {                                                 
-                                                return { 
-                                                    label: d2.year_start + '-' + d2.year_end, 
+
+                                            values: d.risk.filter((d2) => { return d2.type == analysis.id }).map((d2) => {
+                                                return {
+                                                    label: d2.year_start + '-' + d2.year_end,
                                                     year: d2.year_start,
-                                                    rt: parseFloat(d2.rt), 
+                                                    rt: parseFloat(d2.rt),
                                                     def_area: parseFloat(d2.def_area),
                                                     degree_in: parseFloat(d2.degree_in),
                                                     degree_out: parseFloat(d2.degree_in),
                                                     betweenness: parseFloat(d2.betweenness),
                                                     closeness: parseFloat(d2.closeness),
-                                                }; })
+                                                };
+                                            })
                                         };
-                                    });                                    
-                                    const centrality_measures = ["max","min","avg"];                                    
+                                    });
+                                    const centrality_measures = ["max", "min", "avg"];
                                     var datum_centrality = [...datum_summary];
-                                    for(var i = 0; i< centrality_measures.length; i++){
-                                        
+                                    for (var i = 0; i < centrality_measures.length; i++) {
+
                                         datum_centrality.push(
-                                            {key: centrality_measures[i],
-                                            values: data_cen
-                                                .filter((d2) => { return d2.analysis.type == analysis.id })
-                                                .map((d2) => {
-                                                    return {
-                                                        label: d2.analysis.year_start + '-' + d2.analysis.year_end, 
-                                                        year: d2.analysis.year_start,
-                                                        degree_in: parseFloat(d2.degree_in[centrality_measures[i]]), 
-                                                        degree_out: parseFloat(d2.degree_out[centrality_measures[i]]), 
-                                                        betweenness: parseFloat(d2.betweenness[centrality_measures[i]]), 
-                                                        closeness: parseFloat(d2.closeness[centrality_measures[i]])
-                                                    };})
+                                            {
+                                                key: centrality_measures[i],
+                                                values: data_cen
+                                                    .filter((d2) => { return d2.analysis.type == analysis.id })
+                                                    .map((d2) => {
+                                                        return {
+                                                            label: d2.analysis.year_start + '-' + d2.analysis.year_end,
+                                                            year: d2.analysis.year_start,
+                                                            degree_in: parseFloat(d2.degree_in[centrality_measures[i]]),
+                                                            degree_out: parseFloat(d2.degree_out[centrality_measures[i]]),
+                                                            betweenness: parseFloat(d2.betweenness[centrality_measures[i]]),
+                                                            closeness: parseFloat(d2.closeness[centrality_measures[i]])
+                                                        };
+                                                    })
                                             })
                                     }
                                     // Loading information for plots
@@ -204,14 +207,14 @@ function Locality() {
                                 error => {
                                     const resMessage = (error.response && error.response.data && error.response.data.message) ||
                                         error.message || error.toString();
-                                    
+
                                     setLoading(false);
                                 });
                         },
                         error => {
                             const resMessage = (error.response && error.response.data && error.response.data.message) ||
                                 error.message || error.toString();
-                            
+
                             setLoading(false);
                         }
                     );
@@ -226,64 +229,60 @@ function Locality() {
     }
 
     return (
-            
 
-            <div id="containerpages">
-                <div className="container pages">
 
-                    <section className="row" id="headerpages">
+        <div id="containerpages">
+            <div className="container pages">
+
+                <section className="row" id="headerpages">
                     <article className="col-md-5">
-                
-                    <Form ref={c => { setForm(c); }} onSubmit={handleSearchLocality} >
-                    <div className="form-group row">
-                        <label htmlFor="txtLocalities" className="col-sm-6 col-form-label">Veredas:</label>
-                        <div className="col-sm-6">
-                            <ListLocalities id="txtLocalities" 
-                                list={list_localities} 
-                                onChange={setLocalities} />
-                        </div>
 
-                        <label htmlFor="cboTypes" className="col-sm-6 col-form-label">Tipo de análisis:</label>
-                        <div className="col-sm-3">
-                            <DropdownButton  id="cboAnalysis" title={analysis.label}>
-                                {list_analysis.map((item, idx) => (
-                                    <Dropdown.Item onClick={e => setAnalysis(item)} key={item.id}>{item.label}</Dropdown.Item>
-                                ))}
-                            </DropdownButton>
-                        </div>
+                        <Form ref={c => { setForm(c); }} onSubmit={handleSearchLocality} >
+                            <div className="form-group row">
+                                <label htmlFor="txtLocalities" className="col-sm-6 col-form-label">Veredas:</label>
+                                <div className="col-sm-6">
+                                    <ListLocalities id="txtLocalities"
+                                        list={list_localities}
+                                        onChange={setLocalities} />
+                                </div>
 
-                        <div className="col-sm-3">
-                            <button className="w-100 btn btn-primary" disabled={loading}>
-                                {loading && (
-                                    <span className="spinner-border spinner-border-sm"></span>
-                                )}
-                                <span>Buscar</span>
-                            </button>
-                        </div>
-                    </div>
-                    </Form>
-                    
+                                <label htmlFor="cboTypes" className="col-sm-6 col-form-label">Tipo de análisis:</label>
+                                <div className="col-sm-3">
+                                    <DropdownButton id="cboAnalysis" title={analysis.label}>
+                                        {list_analysis.map((item, idx) => (
+                                            <Dropdown.Item onClick={e => setAnalysis(item)} key={item.id}>{item.label}</Dropdown.Item>
+                                        ))}
+                                    </DropdownButton>
+                                </div>
+
+                                <div className="col-sm-3">
+                                    <button className="w-100 btn btn-primary" disabled={loading}>
+                                        {loading && (
+                                            <span className="spinner-border spinner-border-sm"></span>
+                                        )}
+                                        <span>Buscar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </Form>
+
                     </article>
 
-                    <article className="col-md-7">        
-                    <p className="text-justify" id="textoheaderpage">
-                    <b>Análisis por vereda:</b> En esta página usted podrá encontrar los resultados de análisis de riesgo de
-                    deforestación asociado a ganadería al nivel de nacional por cada vereda.
-                    Primero deberá seleccionar las veredas que desea analizar, luego podrá
-                    seleccionar el tipo de análisis que desea revisar.
-                    Actualmente se cuenta con dos tipos de análisis: Anual y Acumulado.
-                    </p>
+                    <article className="col-md-7">
+                        <p className="text-justify" id="textoheaderpage">
+                            <b>Análisis por vereda:</b> En esta página usted podrá encontrar los resultados de análisis de riesgo de
+                            deforestación asociado a ganadería al nivel de nacional por cada vereda.
+                            Primero deberá seleccionar las veredas que desea analizar, luego podrá
+                            seleccionar el tipo de análisis que desea revisar.
+                            Actualmente se cuenta con dos tipos de análisis: Anual y Acumulado.
+                        </p>
                     </article>
 
-                    </section>
+                </section>
 
-
-
-
-
-                    <section className="row" id="ubicacion">
+                <section className="row" id="ubicacion">
                     <article className="col-md-12">
-                        
+
                         <p className="text-justify parrafo-ubicacion">
                             <b>Ubicación: </b>En el siguiente mapa usted podrá observar dondé se encuentran ubicados los
                             predios de ganadería, tambien podrá observar cual es el área potencial
@@ -294,8 +293,8 @@ function Locality() {
                 </section>
 
                 <TotalRiskLocality id="trlRisk" datum={d_summary} />
-                <Centrality id="cenMob" datum={d_centrality}  />
-                
+                <Centrality id="cenMob" datum={d_centrality} />
+
                 <section className="row">
                     <article className="col-md-12">
                         <h2 className="text-center">Movilización</h2>
@@ -329,12 +328,12 @@ function Locality() {
                         <Map center={map_country.center} zoom={map_country.zoom} geo={d_mobilization} type={analysis.id} />
                     </article>
                     <article className="col-md-6">
-                        <ImportExport id="iexMobilization" import={d_import} export={d_export} />                        
+                        <ImportExport id="iexMobilization" import={d_import} export={d_export} />
                     </article>
                 </section>
 
             </div>
-            </div>
+        </div>
     )
 
 
