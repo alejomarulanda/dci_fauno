@@ -21,7 +21,7 @@ columns_rm = ["NOMBRE_OFICINA","ESTADO","NUMERO_GUIA","TIPO_ORIGEN","NOMBRE_DEST
 
 f_raw = os.path.join(inputs,"mob", "download", "mobilization.csv")
 
-df_raw = pd.read_csv(f_raw, encoding = "ISO-8859-1")
+df_raw = pd.read_csv(f_raw, encoding = "utf-8")
 print("Mobilization  loaded")
 
 # Creating a SIT field for origin
@@ -33,10 +33,10 @@ gdf_p = gpd.read_file(f_plots)
 print("Plots loaded")
 
 gdf_p["ID_SITIO"] = gdf_p["adm1_name"] + "_" + gdf_p["adm2_name"] + "_" + gdf_p["adm3_name"]
-gdf_p.to_csv(os.path.join(inputs,"mob", "download", "plots.csv"), index = False, encoding = "ISO-8859-1")
+gdf_p.to_csv(os.path.join(inputs,"mob", "download", "plots.csv"), index = False, encoding = "utf-8")
 gdf_p.head()
 
-df_plots = pd.read_csv( os.path.join(inputs,"mob", "download", "plots.csv"), encoding = "ISO-8859-1")
+df_plots = pd.read_csv( os.path.join(inputs,"mob", "download", "plots.csv"), encoding = "utf-8")
 
 
 for y in [2017.0, 2018.0]:    
@@ -92,4 +92,4 @@ for y in [2017.0, 2018.0]:
     
     print("Guardando")
     print(df_new.head())
-    df_new.to_csv(os.path.join(inputs,"mob", "content", str(y) + ".csv"), index = False, encoding = "ISO-8859-1")
+    df_new.to_csv(os.path.join(inputs,"mob", "content", str(y) + ".csv"), index = False, encoding = "utf-8")

@@ -4,9 +4,12 @@ import * as turf from '@turf/turf'
 import { MapContainer, TileLayer, GeoJSON, LayersControl, WMSTileLayer, Polygon, CircleMarker, Tooltip, Marker, Popup, Polyline } from 'react-leaflet'
 
 function Map(props) {
-    const [url_def, setUrlDef] = React.useState("http://localhost:8600/geoserver/deforestacion_anual/wms");
+    const [url_def_annual, setUrlDefAnnual] = React.useState("http://localhost:8600/geoserver/deforestacion_anual/wms");
+    const [url_def_summary, setUrlDefSummary] = React.useState("http://localhost:8600/geoserver/deforestacion_acumulada/wms");
+    const [url_national_annual, setUrlNatAnnual] = React.useState("http://localhost:8600/geoserver/nacional_anual/wms");
     //const [color_risk, setColorRisk] = React.useState(["#33cc33", "#ffff66", "#ffcc66", "#ff9966", "#ff0066"]);
     const { BaseLayer } = LayersControl;
+    const [years, setYears] = React.useState([2010,2012,2013,2014,2015,2016,2017,2018]);
 
     return (
         <>
@@ -15,40 +18,41 @@ function Map(props) {
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-
-                {props.type === 'detail' ?
-                    <LayersControl position="topright">
-                        <BaseLayer name="Deforestacion 2010">
-                            <WMSTileLayer
-                                layers={'deforestacion_anual:2010'}
-                                attribution=''
-                                url={url_def}
-                                format={"image/png"}
-                                transparent={true}
-                            />
+                <LayersControl position="topright">
+                    {props.national ? 
+                        <>
+                            <BaseLayer name={"Riesgo 2017 "}>
+                                <WMSTileLayer
+                                    layers={'nacional_anual:2017'}  
+                                    attribution=''
+                                    url={url_national_annual}
+                                    format={"image/png"}
+                                    transparent={true}
+                                />
+                            </BaseLayer>
+                            <BaseLayer name={"Riesgo 2018 "}>
+                                <WMSTileLayer
+                                    layers={'nacional_anual:2018'}  
+                                    attribution=''
+                                    url={url_national_annual}
+                                    format={"image/png"}
+                                    transparent={true}
+                                />
+                            </BaseLayer>
+                        </>
+                        :
+                        years.map((item,index)=>{
+                        return <BaseLayer name={"Deforestación " + item}>
+                                <WMSTileLayer
+                                    layers={props.type === 'detail' ? 'deforestacion_anual:' + item: 'deforestacion_acumulada:' + item}  
+                                    attribution=''
+                                    url={props.type === 'detail' ? url_def_annual : url_def_summary}
+                                    format={"image/png"}
+                                    transparent={true}
+                                />
                         </BaseLayer>
-                        <BaseLayer name="Deforestacion 2012">
-                            <WMSTileLayer
-                                layers={'deforestacion_anual:2012'}
-                                attribution=''
-                                url={url_def}
-                                format={"image/png"}
-                                transparent={true}
-                            />
-                        </BaseLayer>
-                        <BaseLayer name="Deforestacion 2013">
-                            <WMSTileLayer
-                                layers={'deforestacion_anual:2013'}
-                                attribution=''
-                                url={url_def}
-                                format={"image/png"}
-                                transparent={true}
-                            />
-                        </BaseLayer>
-                    </LayersControl> :
-                    <LayersControl position="topright"></LayersControl>
-                }
-
+                    })}
+                </LayersControl>
                 {props.buffers_main && props.buffers_main.length > 0 ?
                     props.buffers_main.map((item) => {
                         var pt = {

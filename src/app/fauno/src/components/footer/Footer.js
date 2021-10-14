@@ -9,7 +9,7 @@ class Footer extends Component {
       				<img src="images/footer-con-logo.png" alt=""/>
     				
                     <div id="fondo-footer">
-                    &copy; 2021 Alliance Bioversity International - CIAT - <a href="#">Política de Privacidad</a> - <a href="#">Términos y condiciones</a>
+                    &copy; 2021 Alliance Bioversity International - CIAT - <a href="#/politica">Política de Privacidad</a> - <a href="#/terminos">Términos y condiciones</a>
                     </div>
             		</footer>
         );

@@ -42,7 +42,8 @@ def download_data(inputs, url):
 # Method that reprojects 
 # (string) inputs: Path where inputs files should be located
 # (int) dst_crs: New system CRS of destination
-def reproject_source(inputs, dst_crs, adm1_name, adm1_id, adm2_name, adm2_id, adm3_name, adm3_id, area, geometry):
+# (string) encoding: Encoding format
+def reproject_source(inputs, dst_crs, adm1_name, adm1_id, adm2_name, adm2_id, adm3_name, adm3_id, area, geometry,encoding="utf-8"):
     content_folder = os.path.join(inputs,"content")
     # Creates output folder
     outputs_folder = os.path.join(inputs,"fixed")
@@ -52,7 +53,7 @@ def reproject_source(inputs, dst_crs, adm1_name, adm1_id, adm2_name, adm2_id, ad
     pattern = inputs + os.path.sep + "content" + os.path.sep + '**' + os.path.sep + '**.shp'
     files = glob.glob(pattern, recursive=True)
     print("Opening the first file: " + files[0])
-    data = gpd.read_file(files[0])
+    data = gpd.read_file(files[0], encoding=encoding)
     print("Reprojecting")
     data = data.to_crs(crs = from_epsg(dst_crs))
     data = data[[adm1_id,adm1_name,adm2_id,adm2_name,adm3_id,adm3_name,area,geometry]]
@@ -61,4 +62,4 @@ def reproject_source(inputs, dst_crs, adm1_name, adm1_id, adm2_name, adm2_id, ad
     
     output_file = os.path.join(outputs_folder,"adm.shp")
     print("Saving: " + output_file)
-    data.to_file(output_file)
+    data.to_file(output_file,encoding=encoding)

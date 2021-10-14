@@ -23,10 +23,13 @@ function Menu (props) {
             <div className="collapse navbar-collapse" id="navbarCollapse">
                 <ul className="navbar-nav mr-auto">
                     <li className="nav-item">
-                        <a className="nav-link" href="#/vereda">Análisis vereda</a>
+                        <a className="nav-link" href="#/nacional">Nacional</a>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link" href="#/productor">Análisis productor</a>
+                        <a className="nav-link" href="#/vereda">Vereda</a>
+                    </li>
+                    <li className="nav-item">
+                        <a className="nav-link" href="#/productor">Productor</a>
                     </li>
                     <li className="nav-item">
                         <a className="nav-link" href="#/datos">Base de datos</a>

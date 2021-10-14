@@ -15,7 +15,7 @@ from fiona.crs import from_epsg
 # (string) inputs: Path where inputs files should be located
 # (array) years: Array of ints with all years that should be processed
 # (array) types_analysis: Array of strings with the types of
-def deforestation_plot(inputs, years, types_analysis, pixel_size):
+def deforestation_plot(inputs, years, types_analysis, pixel_size, encoding="utf-8"):
     
     in_buffer_root = os.path.join(inputs,"plot","fixed","buffer")
     # Create output folder
@@ -58,7 +58,7 @@ def deforestation_plot(inputs, years, types_analysis, pixel_size):
                         os.mkdir(f_folder)
                     output_file = os.path.join(f_folder, "areas.shp")
                     print("Saving: " + output_file)
-                    gdf.to_file(output_file)
+                    gdf.to_file(output_file,encoding=encoding)
                     
 # Method that calculates distance between a point and shapes.
 # It just calculates distance for the near shape
@@ -81,7 +81,8 @@ def neighbour_distance(gdf_chunk, pts):
 # (string) inputs: Path where inputs files should be located
 # (array) years: Array of ints with all years that should be processed
 # (array) types_analysis: Array of strings with the types of
-def distance_plot(inputs, years, types_analysis):
+# (string) encoding: Encoding format
+def distance_plot(inputs, years, types_analysis, encoding="utf-8", n_cores=10):
     in_areas_root = os.path.join(inputs,"plot","fixed","def")
     in_def_root = os.path.join(inputs,"def","fixed")
     # Create output folder
@@ -91,7 +92,7 @@ def distance_plot(inputs, years, types_analysis):
     
     # CPUS to use
     #cpus = mp.cpu_count() - 1 
-    cpus = 20
+    cpus = n_cores
     print("CPUs: " + str(cpus))
     pool = mp.Pool(processes=cpus)
 
@@ -105,11 +106,11 @@ def distance_plot(inputs, years, types_analysis):
             
             file_areas = os.path.join(in_areas_root,ta,str(y),"areas.shp")
             print("Opening areas shp: " + file_areas)    
-            shp_areas = gpd.read_file(file_areas)
+            shp_areas = gpd.read_file(file_areas, encoding=encoding)
             
             file_def = os.path.join(in_def_root,"shp_" + ta, str(y), "shapefile.shp")
             print("Opening deforestation shp: " + file_def)    
-            shp_def = gpd.read_file(file_def)
+            shp_def = gpd.read_file(file_def, encoding=encoding)
             
             print("Fixing fields")
             # Creating centroids for buffer areas
@@ -134,7 +135,7 @@ def distance_plot(inputs, years, types_analysis):
                 os.mkdir(f_folder)
             output_file = os.path.join(f_folder, "areas_distance.shp")
             print("Saving: " + output_file)
-            shp_areas.to_file(output_file)
+            shp_areas.to_file(output_file,encoding=encoding)
 
 # Method which calculates 
 # (GeoDataFrame) gdf_chunk: GeoDataFrame, which has data, in which the system should calculate direct risk for each row
@@ -174,7 +175,8 @@ def calculate_risk_direct(gdf_chunk, param):
 # (array) years: Array of ints with all years that should be processed
 # (array) types_analysis: Array of strings with the types of
 # (int) dst_crs: New system CRS of destination
-def risk_direct(inputs, years, types_analysis, dst_crs):
+# (string) encoding: Encoding format
+def risk_direct(inputs, years, types_analysis, dst_crs, encoding="utf-8",n_cores=10):
     in_dis_root = os.path.join(inputs,"plot","fixed","dis")
     # Create output folder
     outputs_folder = os.path.join(inputs,"plot","fixed","risk")
@@ -183,7 +185,7 @@ def risk_direct(inputs, years, types_analysis, dst_crs):
     
     # CPUS to use
     #cpus = mp.cpu_count() - 1 
-    cpus = 20
+    cpus = n_cores
     pool = mp.Pool(processes=cpus)
     print("CPUs: " + str(cpus))
 
@@ -197,7 +199,7 @@ def risk_direct(inputs, years, types_analysis, dst_crs):
 
             file_dis = os.path.join(in_dis_root,ta,str(y),"areas_distance.shp")
             print("Opening areas shp: " + file_dis)    
-            shp_dis = gpd.read_file(file_dis)
+            shp_dis = gpd.read_file(file_dis, encoding=encoding)
 
             print("Reprojecting to: " + str(from_epsg(dst_crs)))
             shp_dis = shp_dis.to_crs(crs = from_epsg(dst_crs))
@@ -218,7 +220,7 @@ def risk_direct(inputs, years, types_analysis, dst_crs):
                 os.mkdir(f_folder)
             output_file = os.path.join(f_folder, "rd.shp")
             print("Saving: " + output_file)
-            shp_dis.to_file(output_file)
+            shp_dis.to_file(output_file,encoding=encoding)
 
 # Method that calculates
 def total_risk_plot(plots, mobilization, risk_plots, type_plot):    
@@ -242,7 +244,7 @@ def total_risk_plot(plots, mobilization, risk_plots, type_plot):
         plots.at[index,'rt'] = math.ceil(rt_real)
     return plots
 
-def total_risk(inputs, years, types_analysis, type_plot):
+def total_risk(inputs, years, types_analysis, type_plot, encoding="utf-8", n_cores=10):
     in_mob_root = os.path.join(inputs,"mob","fixed")
     in_risk_root = os.path.join(inputs,"plot","fixed","risk")
     # Create output folder
@@ -252,7 +254,7 @@ def total_risk(inputs, years, types_analysis, type_plot):
     
     # CPUS to use
     #cpus = mp.cpu_count() - 2 
-    cpus = 10
+    cpus = n_cores
     pool = mp.Pool(processes=cpus)
     print("CPUs: " + str(cpus))
 
@@ -266,11 +268,11 @@ def total_risk(inputs, years, types_analysis, type_plot):
 
             file_shp = os.path.join(in_risk_root,ta,str(y),"rd.shp")
             print("Opening areas shp: " + file_shp)    
-            shp = gpd.read_file(file_shp)
+            shp = gpd.read_file(file_shp, encoding=encoding)
 
             file_csv = os.path.join(in_mob_root,str(y) + ".csv")
             print("Opening mobilization: " + file_csv)    
-            df = pd.read_csv(file_csv, encoding = "ISO-8859-1")
+            df = pd.read_csv(file_csv, encoding = "utf-8")
             df["id_source"] = df["id_source"].astype(str).str.split('.', expand = True)[0]
             df["id_destination"] = df["id_destination"].astype(str).str.split('.', expand = True)[0]
 
@@ -292,7 +294,7 @@ def total_risk(inputs, years, types_analysis, type_plot):
                 os.mkdir(f_folder)
             output_file = os.path.join(f_folder, "total.shp")
             print("Saving: " + output_file)
-            shp.to_file(output_file)
+            shp.to_file(output_file,encoding=encoding)
 
 
 

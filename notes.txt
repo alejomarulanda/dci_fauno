@@ -24,14 +24,22 @@ pip install PyJWT
 pip install requests
 pip install mongoengine
 
+###########################################################
+
+Ruta 
+
+\\Catalogue\ganabosques
 
 ##########################################################
 
 docker pull mongo:4.2
-docker run --name fauno_db -p 27017:27017 -v D:/CIAT/Code/BID/dci_fauno/data/fauno_db/data:/data/db -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=secret -e MONGO_INITDB_DATABASE=fauno_db -d mongo:4.2
+# docker run --name fauno_db -p 27017:27017 -v D:/CIAT/Code/BID/dci_fauno/data/fauno_db/data:/data/db -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=secret -e MONGO_INITDB_DATABASE=fauno_db -d mongo:4.2
+
+docker run --name fauno_db -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=secret -e MONGO_INITDB_DATABASE=fauno_db ./.env -v D:/CIAT/Code/BID/dci_fauno_docker/src/database/data/backup:/backup -d stevensotelo/fauno_db:latest
 
 ##########################################################
 
+docker run -it --rm -v /dapadfs/workspace/GANABOSQUES/:/dapadfs/ dapaciat/python:3.9-busterlatest /bin/bash
 docker run -it --rm -v /dapadfs/:/dapadfs/ dapaciat/python:3.9-busterlatest /bin/bash
 cd /dapadfs/workspace_cluster_9/Aichi13/BID/risk_calculator/script/
 
@@ -65,3 +73,15 @@ https://hub.docker.com/r/kartoza/geoserver/
 https://github.com/kartoza/docker-geoserver
 
 docker run -d -p 8600:8080 --name geoserver -e SAMPLE_DATA=false -e EXISTING_DATA_DIR=true -v D:/CIAT/Code/BID/dci_fauno/data/geoserver/data/:/opt/geoserver/data_dir/data/ kartoza/geoserver:latest
+
+#########################################################
+
+SDL
+
+https://docs.geoserver.org/stable/en/user/styling/sld/
+https://docs.geoserver.org/stable/en/user/styling/sld/tipstricks/transformation-func.html
+
+
+https://docs.geoserver.org/latest/en/user/styling/workshop/ysld/polygon.html
+
+https://docs.geoserver.org/stable/en/user/styling/sld/cookbook/polygons.html
