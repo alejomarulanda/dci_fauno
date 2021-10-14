@@ -228,7 +228,7 @@ def summary_deforestation(inputs):
 # Method that transforms raster files to shapefiles.
 # This methods applies the transformation for detail and summary files
 # (string) inputs: Path where inputs files should be located
-def to_shp(inputs):
+def to_shp(inputs, encoding="utf-8"):
     outputs_folder = os.path.join(inputs, "fixed")
     folders = ["detail", "summary"]
     crs = None
@@ -262,4 +262,4 @@ def to_shp(inputs):
                 os.mkdir(f_folder)
             dest_file = os.path.join(f_folder,"shapefile.shp")
             print("Saving: " + dest_file)    
-            gdf.to_file(dest_file)
+            gdf.to_file(dest_file,encoding=encoding)

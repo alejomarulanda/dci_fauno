@@ -11,6 +11,7 @@ from mongoengine import *
 from fauno_entities import *
 import datetime
 
+# Method that print the progress of a task
 def print_progress(shape,current):
     done = int(50 * current / shape)
     print("[%s%s]" % ('=' * done, ' ' * (50-done)), end="\r", flush=True )
@@ -32,10 +33,14 @@ def extract_master_data(data, fields, file, key):
 
 # Method that creates output files, which can be imported to database
 
-def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
-    in_risk = os.path.join(inputs,"plot","fixed","total")
+def generate_outputs(inputs, outputs, years, types_analysis, type_plot, encoding="utf-8"):
+    in_risk = os.path.join(inputs,"plot","fixed","total")    
     in_mob = os.path.join(inputs,"mob","fixed")
     out_mob_log = os.path.join(inputs, "mob", "log")
+    in_adm_shp_path = os.path.join(inputs,"adm","fixed","adm.shp")
+    
+    print("Loading SHP ADM")
+    in_adm_shp = gpd.read_file(in_adm_shp_path, encoding=encoding)
     # Create output folder    
     if not os.path.exists(outputs):
         os.mkdir(outputs)
@@ -52,7 +57,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
 
             file_shp = os.path.join(in_risk,ta,str(y),"total.shp")
             print("Opening areas shp: " + file_shp)
-            shp = gpd.read_file(file_shp)
+            shp = gpd.read_file(file_shp, encoding=encoding)
             shp["ext_id"] = shp["ext_id"].astype(str).str.split('.', expand = True)[0]
             #shp["buffer_radio"] = math.sqrt(shp['geometry'].area/math.pi)
             
@@ -63,7 +68,8 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             extract_master_data(shp, ["adm2_id","adm3_id","adm3_name"], os.path.join(outputs,"localities.csv"), ["adm3_id"])
             
             # Cattle rancher
-            extract_master_data(shp, ["adm3_id","ext_id","lat","lon", "buffer_radio"], os.path.join(outputs,"cattle_rancher.csv"), ["ext_id"])
+            #extract_master_data(shp, ["adm3_id","ext_id","lat","lon", "buffer_radio"], os.path.join(outputs,"cattle_rancher.csv"), ["ext_id"])
+            extract_master_data(shp, ["adm3_id","ext_id","lat","lon"], os.path.join(outputs,"cattle_rancher.csv"), ["ext_id"])
 
             print("Starting analysis")
             outputs_folder = os.path.join(outputs,ta)
@@ -74,7 +80,9 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
                 os.mkdir(outputs_folder)
             
             print("Processing Cattle Rancher Risk")
-            df_ct = shp[["adm3_id","ext_id","def_prop","dp","dd","rd","ri","ro","rt","animals","area","field_capa","def_area","distance", "buffer_radio","lat","lon"]]
+            #df_ct = shp[["adm3_id","ext_id","def_prop","dp","dd","rd","ri","ro","rt","animals","area","field_capa","def_area","distance", "buffer_radio","lat","lon"]]
+            df_ct = shp[["adm3_id","ext_id","def_prop","dp","dd","rd","ri","ro","rt","animals","area","field_capa","def_area","distance","lat","lon"]]
+            df_ct["buffer_radio"] = 0
             ct_file = os.path.join(outputs_folder,"cattle_rancher_risk.csv")
             print("Saving: " + ct_file)
             df_ct.to_csv(ct_file, index = False, encoding = "ISO-8859-1")
@@ -106,7 +114,7 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             ctm_log = os.path.join(out_mob_log,"cattle_rancher_network.csv")
             print("Saving: " + ctm_file)
             print("Shape: " + str(new_mob.shape))
-            new_mob.to_csv(ctm_file, index = False, encoding = "ISO-8859-1")
+            new_mob.to_csv(ctm_file, index = False, encoding = "")
             print("Saving:" + ctm_log)
             print("Shape: " + str(mob_bad.shape))
             mob_bad.to_csv(ctm_log, index = False, encoding = "ISO-8859-1")
@@ -160,19 +168,30 @@ def generate_outputs(inputs, outputs, years, types_analysis, type_plot):
             g_indicators = pd.merge(g_indicators, g_indicators_tmp, left_on = "adm3_id",right_on="adm3_id",how='inner')
 
             print("Pivoting localities risk")
-            loc_col = ["rt","animals","area","def_area"]
-            print(df_ct.head())
-            loc_risk = pd.pivot_table(df_ct, values=loc_col, index=["adm3_id"], aggfunc=[np.sum, np.mean, lambda x: len(x.unique())],fill_value=0.0)
-            print(loc_risk.head())
+            loc_col = ["rt","animals","area","def_area"]            
+            loc_risk = pd.pivot_table(df_ct, values=loc_col, index=["adm3_id"], aggfunc=[np.sum, np.mean, lambda x: len(x.unique())],fill_value=0.0)            
             loc_risk.reset_index(inplace=True)
 
             print("Merging with centrality indicators")
             l_r = pd.merge(loc_risk, g_indicators, left_on = "adm3_id",right_on="adm3_id",how='inner')
-            l_r.columns = ["adm3_id","adm3_id","animals_sum","area_sum","def_area_sum","rt_sum","animals_mean","area_mean","def_area_mean","rt_mean","cd","cdi","cdo","cc","cb"]
+            #print(l_r.head())
+            l_r.columns = ["adm3_id","id_adm3","animals_sum","area_sum","def_area_sum","rt_sum","animals_mean","area_mean","def_area_mean","rt_mean", "lambda_animals","lambda_area","lambda_def_area","lambda_rt","cd","cdi","cdo","cc","cb"]
+            l_r = l_r[["adm3_id","animals_sum","area_sum","def_area_sum","rt_sum","animals_mean","area_mean","def_area_mean","rt_mean", "cd","cdi","cdo","cc","cb"]]
 
             loc_r_file = os.path.join(outputs_folder,"locality_risk.csv")
             print("Saving: " + loc_r_file)
             l_r.to_csv(loc_r_file, index = False, encoding = "ISO-8859-1")
+            
+
+            loc_shp_folder = os.path.join(outputs_folder,"shp")
+            print("Saving SHP into: " + loc_shp_folder)
+            if not os.path.exists(loc_shp_folder):
+                os.mkdir(loc_shp_folder)
+            
+            shp_adm_year = in_adm_shp.merge(l_r,how='inner',on='adm3_id')
+            shp_adm_year.to_file(os.path.join(loc_shp_folder,"indicators.shp"),encoding=encoding)
+
+
 
 def save_database(outputs, years, type_analysis, db_user, db_pwd, db_name, db_server, db_port):
     log_folder = os.path.join(outputs,"log")

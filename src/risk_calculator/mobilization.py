@@ -14,7 +14,7 @@ def fixed_data(inputs, columns_rm, c_origin, c_destination, c_type):
     files = glob.glob(os.path.join(content_folder, "*.csv"), recursive=True)
     for file in files:
         print("Processing: " + file)
-        df = pd.read_csv(file, encoding = "ISO-8859-1")
+        df = pd.read_csv(file, encoding = "utf-8")
         df["SIT_ORIGEN"] = df["SIT_ORIGEN"].astype(str).str.split('.', expand = True)[0]
         df["SIT_DESTINO"] = df["SIT_DESTINO"].astype(str).str.split('.', expand = True)[0]
         print("Removing columns")
@@ -38,7 +38,7 @@ def fixed_data(inputs, columns_rm, c_origin, c_destination, c_type):
         fl_paths = file.split(os.path.sep)
         output_file = os.path.join(outputs_folder, fl_paths[len(fl_paths)-1])
         print("Saving: " + output_file)
-        df.to_csv(output_file, index = False, encoding = "ISO-8859-1")
+        df.to_csv(output_file, index = False, encoding = "utf-8")
 
         
         

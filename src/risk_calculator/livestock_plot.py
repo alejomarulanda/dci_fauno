@@ -42,7 +42,7 @@ def processing_raw_data(inputs, character_file, ext_id, lat, lon, animals, lat_l
     # Loop to compile all datasources
     for file in files:
         print("Reading: " + file)
-        df_t = pd.read_csv(file, encoding = "ISO-8859-1", sep=character_file)
+        df_t = pd.read_csv(file, encoding = "utf-8", sep=character_file)
         # Extracting year from file name
         file_full_name = file.split(os.path.sep)
         year = file_full_name[len(file_full_name)-1].replace(".csv","")
@@ -73,7 +73,7 @@ def processing_raw_data(inputs, character_file, ext_id, lat, lon, animals, lat_l
     df_bad_records = df_original_fin.isin(df_final)
     df_records = df_bad_records["ext_id"]
     bad_plots = df_original_fin[df_records == False]
-    bad_plots.to_csv(log_file, index = False, encoding = "ISO-8859-1")
+    bad_plots.to_csv(log_file, index = False, encoding = "utf-8")
 
     print("Goruping and filtering max")
     df_final['animals_max'] = df_final.groupby(['ext_id'])['animals'].transform(max)
@@ -81,14 +81,16 @@ def processing_raw_data(inputs, character_file, ext_id, lat, lon, animals, lat_l
 
     output = content_folder + os.path.sep + 'plots.csv'
     print("Saving: " + output)
-    df_final.to_csv(output, index = False, encoding = "ISO-8859-1")
+    df_final.to_csv(output, index = False, encoding = "utf-8")
 
 # Method that creates a layer (shapefile) with locations of farmers where livestock is located
 # (string) inputs: Path where inputs files should be located
 # (string) path_shp_adm: Path where the shapefile of reference is located
 # (int) src_crs: Current system CRS of coordinates of plots
 # (int) dst_crs: New system CRS of destination
-def create_data(inputs, path_shp_adm, src_crs, dst_crs):
+# (int) dst_crs: New system CRS of destination
+# (string) encoding: Encoding format
+def create_data(inputs, path_shp_adm, src_crs, dst_crs, encoding="utf-8"):
     content_folder = os.path.join(inputs,"content")
     # Creates output folder
     outputs_folder = os.path.join(inputs,"fixed")
@@ -100,7 +102,7 @@ def create_data(inputs, path_shp_adm, src_crs, dst_crs):
         
     file_src = os.path.join(content_folder, "plots.csv")
     print("Opening: " + file_src)
-    df_plots = pd.read_csv(file_src, encoding = "ISO-8859-1")
+    df_plots = pd.read_csv(file_src, encoding = "utf-8")
     df_plots["ext_id"] = df_plots["ext_id"].astype(str)
 
     print("Transforming to points")
@@ -109,7 +111,7 @@ def create_data(inputs, path_shp_adm, src_crs, dst_crs):
     gdf_plots = gdf_plots.to_crs(crs = from_epsg(dst_crs))
 
     print("Opening shp reference: " + path_shp_adm)
-    gdf_adm = gpd.read_file(path_shp_adm)
+    gdf_adm = gpd.read_file(path_shp_adm, encoding=encoding)
     gdf_adm = gdf_adm.to_crs(crs = from_epsg(dst_crs))
 
     print("Joining spatial")
@@ -119,13 +121,14 @@ def create_data(inputs, path_shp_adm, src_crs, dst_crs):
     # Create a folder for each shapefile with the year name    
     output_file = os.path.join(plots_folder,"plots.shp")
     print("Saving: " + output_file)
-    gdf_join.to_file(output_file)
+    gdf_join.to_file(output_file,encoding=encoding)
 
 # Method that creates a buffer for plots
 # (string) inputs: Path where inputs files should be located
 # (DataFrame) size_regions: DataFrame with the field capacity for all regions
 # (int) dst_crs: New system CRS of destination
-def create_buffer(inputs, size_regions, dst_crs):
+# (string) encoding: Encoding format
+def create_buffer(inputs, size_regions, dst_crs, encoding="utf-8"):
     content_folder = os.path.join(inputs,"content")
     outputs_folder = os.path.join(inputs,"fixed")
     plots_folder = os.path.join(outputs_folder,"plots")
@@ -135,7 +138,7 @@ def create_buffer(inputs, size_regions, dst_crs):
     
     plots_file = os.path.join(plots_folder,"plots.shp")
     print("Opening plots shape file: " + plots_file)
-    gdf_plots = gpd.read_file(plots_file)
+    gdf_plots = gpd.read_file(plots_file, encoding=encoding)
     gdf_plots = gdf_plots.to_crs(crs = from_epsg(dst_crs))
 
     print("Mergin with field capacity")
@@ -159,7 +162,7 @@ def create_buffer(inputs, size_regions, dst_crs):
    
     output_file = os.path.join(buffer_folder,"buffer.shp")
     print("Saving: " + output_file)
-    buffered.to_file(output_file)
+    buffered.to_file(output_file,encoding=encoding)
     
     
     
