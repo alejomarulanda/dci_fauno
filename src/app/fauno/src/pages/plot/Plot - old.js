@@ -15,10 +15,6 @@ import SearchPlots from "../../services/SearchPlots";
 import './Plot.css';
 
 
-
-
-
-
 //class Locality extends Component {
 function Plot() {
     const [plots, setPlots] = React.useState();    
@@ -41,8 +37,6 @@ function Plot() {
     const [d_radar, setDRadar] = React.useState();
     const [d_import, setDImport] = React.useState([]);
     const [d_export, setDExport] = React.useState([]);
-
-
 
     React.useEffect(() => {
         setAnalysis(list_analysis[0]);
@@ -228,6 +222,8 @@ function Plot() {
                 </section>
 
 
+
+
                 <section className="row">
                     <article className="col-md-12">
                     
@@ -239,13 +235,6 @@ function Plot() {
                         <Map center={map_country.center} zoom={map_country.zoom} buffers_main={map_plots} type={analysis.id} />
                     </article>                    
                 </section>
-
-
-
-
-
-
-
 
                 <DirectRisk id="comDirectRisk" datum={d_summary} />
 
@@ -259,20 +248,17 @@ function Plot() {
                         </p>
                     </article>                                        
                 </section>
-
                 <div className="row" id="movilizacion">
-                        <div className="col-md-2"> </div> 
-                        <label htmlFor="cboPlot" className="col-md-1 col-form-label">Predio:</label>
-                        <div className="col-md-3">
+                        <label htmlFor="cboPlot" className="col-md-2 col-form-label">Predio:</label>
+                        <div className="col-md-4">
                             <DropdownButton id="cboPlot" title={c_plot.ext_id}>                    
                                 {map_plots && map_plots.length > 0 ? map_plots.map((item, idx) => (
                                     <Dropdown.Item onClick={e => changeCurrentPlot(item, d_data)} key={item.ext_id}>{item.ext_id}</Dropdown.Item>
                                 )):
                                 ""}
                             </DropdownButton>
-                        </div> 
-                        <div className="col-md-1"> </div>              
-                        <label htmlFor="cboPeriod" className="col-md-1 col-form-label">Período:</label>
+                        </div>              
+                        <label htmlFor="cboPeriod" className="col-md-2 col-form-label">Período:</label>
                         <div className="col-md-4">
                             <DropdownButton id="cboPeriod" title={c_period ? c_period.label : ""}>                    
                                 {list_periods && list_periods.length > 0 ? list_periods.map((item, idx) => (
@@ -282,16 +268,14 @@ function Plot() {
                             </DropdownButton>
                         </div>              
                     </div>
-
                 <section className="row">
-                    <article className="col-md-12">
+                    <article className="col-md-6">
                     <Map center={map_country.center} zoom={map_country.zoom} buffers_main={m_plot} mobilization={d_mobilization} type={analysis.id}   />
                     </article>
-                    <article className="col-md-12">
+                    <article className="col-md-6">
                         <ImportExport import={d_import} export={d_export} />                        
                     </article>
-                </section> 
-
+                </section>
 
             </div>
         </div>

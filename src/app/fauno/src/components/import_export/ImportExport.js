@@ -11,11 +11,19 @@ function ImportExport(props) {
 
     return (
         <>
-            <div className="ImportExportPlot">
+            
+            <section className="row">
+                    <article className="col-md-6">
+
+                    <div className="ImportExportPlot">
                 <h2 className="text-center">Importación</h2>
                 <NVD3Chart id="pltRiskImport" datum={props.import} type="multiBarChart" x="label" y="value" />
             </div>
-            <div className="ImportExportPlot">
+
+                    </article>
+                    <article className="col-md-6">
+                          
+                          <div className="ImportExportPlot">
                 <h2 className="text-center">Exportación</h2>
                 <NVD3Chart id="pltRiskExport" datum={props.export} 
                     type="multiBarChart" 
@@ -23,9 +31,14 @@ function ImportExport(props) {
                     y="value"
                     xAxis={{rotateLabels: -45}} />
             </div>
+                             
+                    </article>
+                </section>
+            <br /><br />
         </>
     );
 
 }
 
 export default ImportExport;
+

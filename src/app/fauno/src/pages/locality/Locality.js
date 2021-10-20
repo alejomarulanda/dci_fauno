@@ -298,14 +298,15 @@ function Locality() {
                 <section className="row">
                     <article className="col-md-12">
                         <h2 className="text-center">Movilización</h2>
-                        <p className="text-justify">
+                        <p className="text-center">
                             En esta sección se puede analizar la información correspondiente los movimientos de ganadería realizados por los predios
                         </p>
                     </article>
                 </section>
                 <div className="row">
-                    <label htmlFor="cboLocality" className="col-md-2 col-form-label">Vereda:</label>
-                    <div className="col-md-4">
+                <div className="col-md-2"> </div>  
+                    <label htmlFor="cboLocality" className="col-md-1 col-form-label">Vereda:</label>
+                    <div className="col-md-3">
                         <DropdownButton id="cboLocality" title={c_locality.name}>
                             {map_localities && map_localities.length > 0 ? map_localities.map((item, idx) => (
                                 <Dropdown.Item onClick={e => changeCurrentLocality(item, d_data)} key={item.value}>{item.label}</Dropdown.Item>
@@ -313,7 +314,8 @@ function Locality() {
                                 ""}
                         </DropdownButton>
                     </div>
-                    <label htmlFor="cboPeriod" className="col-md-2 col-form-label">Período:</label>
+                    <div className="col-md-1"> </div>  
+                    <label htmlFor="cboPeriod" className="col-md-1 col-form-label">Período:</label>
                     <div className="col-md-4">
                         <DropdownButton id="cboPeriod" title={c_period ? c_period.label : ""}>
                             {list_periods && list_periods.length > 0 ? list_periods.map((item, idx) => (
@@ -322,12 +324,12 @@ function Locality() {
                                 ""}
                         </DropdownButton>
                     </div>
-                </div>
+                </div><br />
                 <section className="row">
-                    <article className="col-md-6">
+                    <article className="col-md-12">
                         <Map center={map_country.center} zoom={map_country.zoom} geo={d_mobilization} type={analysis.id} />
                     </article>
-                    <article className="col-md-6">
+                    <article className="col-md-12">
                         <ImportExport id="iexMobilization" import={d_import} export={d_export} />
                     </article>
                 </section>
