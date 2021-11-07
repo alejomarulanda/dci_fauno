@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './Menu.css';
 import AuthUser from '../../services/AuthUser';
 
 function Menu (props) {    
@@ -16,10 +16,18 @@ function Menu (props) {
     return (
 
         <nav className="navbar navbar-dark sticky-top bg-dark navbar-expand-md p-0 ">
+            <section className="row">
+                <article className="col-lg-4 ">
             <a className="navbar-brand" href="#"></a>
-            <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            
+                </article>
+                <article className="col-lg-8 ">
+
+                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
             </button>
+            
+
             <div className="collapse navbar-collapse" id="navbarCollapse">
                 <ul className="navbar-nav mr-auto">
                     <li className="nav-item">
@@ -38,6 +46,7 @@ function Menu (props) {
                         <a className="nav-link" href="#/acercade">Acerca de</a>
                     </li>
                 </ul>
+
                 <div className="d-flex">
                     <ul className="navbar-nav mr-auto">
 
@@ -59,7 +68,10 @@ function Menu (props) {
 
                     </ul>
                 </div>
+
             </div>
+            </article>
+            </section>
         </nav>
 
     )

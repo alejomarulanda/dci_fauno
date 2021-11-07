@@ -9,7 +9,9 @@ function Centrality(props) {
     return (
         <>
             <section className="row" id="centrality">
-                <article className="col-md-12">
+                <article className="col-md-2">
+                </article>   
+                <article className="col-md-8">
                     <PlotLine id="plbDegreeIn" 
                         title="Grado nodal de entrada"
                         description="El siguiente gráfico le permite analizar el indicador de centralidad
@@ -18,7 +20,13 @@ function Centrality(props) {
                         x="year" 
                         y="degree_in" />
                 </article>
-                <article className="col-md-12">
+                <article className="col-md-2">
+                </article>   
+            </section>
+            <section className="row" id="centrality">
+                <article className="col-md-2">
+                </article>   
+                <article className="col-md-8">
                     <PlotLine id="plbDegreeOut" 
                         title="Grado nodal de salida"
                         description="El siguiente gráfico le permite analizar el indicador de centralidad
@@ -27,8 +35,12 @@ function Centrality(props) {
                         x="year" 
                         y="degree_out"  />
                 </article>
+                <article className="col-md-2">
+                </article>   
             </section>
             <section className="row" id="centrality">
+                <article className="col-md-2">
+                </article>   
                 <article className="col-md-12">
                     <PlotLine id="plbDegreeBe" 
                         title="Intermediación"
@@ -38,6 +50,12 @@ function Centrality(props) {
                         x="year" 
                         y="betweenness"  />
                 </article>
+                <article className="col-md-2">
+                </article>   
+            </section>
+            <section className="row" id="centrality"> 
+                <article className="col-md-2">
+                </article>    
                 <article className="col-md-12">
                     <PlotLine id="plbDegreeCl" 
                         title="Grado nodal de cercania"
@@ -47,6 +65,8 @@ function Centrality(props) {
                         x="year" 
                         y="closeness"  />
                 </article>
+                <article className="col-md-2">
+                </article> 
             </section>
         </>
     );

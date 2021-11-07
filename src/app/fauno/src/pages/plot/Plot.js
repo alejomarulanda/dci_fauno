@@ -287,6 +287,7 @@ function Plot() {
                     <article className="col-md-12">
                     <Map center={map_country.center} zoom={map_country.zoom} buffers_main={m_plot} mobilization={d_mobilization} type={analysis.id}   />
                     </article>
+                    
                     <article className="col-md-12">
                         <ImportExport import={d_import} export={d_export} />                        
                     </article>

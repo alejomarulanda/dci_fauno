@@ -1,0 +1,36 @@
+.navbar-toggler-icon {
+    background-color: #eeeeee !important;
+    border-radius: 5px;
+}
+
+a.navbar-brand {
+width: 100% !important;
+}
+.navbar button{
+	/*position: fixed;*/
+}
+/*
+.navbar{
+	padding: 0 50px !important;
+}*/
+.navbar{
+	display: block !important;
+}
+@media (max-width: 1200px) { 
+
+	.navbar{
+	padding: 0 50px !important;
+
+
+
+}
+}
+@media (min-width: 1201px) { 
+
+	.navbar{
+	padding: 0 150px !important;
+
+
+}
+
+}

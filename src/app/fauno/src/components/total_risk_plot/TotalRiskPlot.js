@@ -19,7 +19,9 @@ function TotalRiskPlot(props) {
     return (
         <>
             <section className="row">
-                <article className="col-md-12">
+                <article className="col-md-2">
+                </article>   
+                <article className="col-md-8">
                     <h2 className="text-center">Factores de riesgo</h2>
                     <p className="text-center">
                         El siguiente gráfico le permite observar cuales son los factores que han influido
@@ -36,7 +38,13 @@ function TotalRiskPlot(props) {
                         }
                     </Carousel>
                 </article>
-                <article className="col-md-12">
+                <article className="col-md-2">
+                </article>   
+            </section>
+            <section className="row">
+                <article className="col-md-2">
+                </article>   
+                <article className="col-md-8">
                     <PlotBar id="plbRisk" 
                         title="Riesgo total"
                         description="El siguiente gráfico le permite observar cual es el riesgo total de cada sitio."
@@ -45,6 +53,8 @@ function TotalRiskPlot(props) {
                         y="rt" 
                         forceY={[0, 4]} />
                 </article>
+                <article className="col-md-2">
+                </article> 
             </section>
         </>
     );

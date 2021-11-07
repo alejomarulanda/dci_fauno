@@ -33,7 +33,6 @@ li.nav-item  a.nav-link {
 background-color: #FFF !important;
     border: none;
     margin: auto;
-padding: 0 150px !important;
 }
 
 
@@ -143,3 +142,11 @@ color:#16522A;
 	background-color: transparent;
 	border:none;
 }
+
+@media (max-width: 1200px) { 
+
+	#containerpages, .container{	
+		padding: 20px;
+	}
+}
+

@@ -8,7 +8,9 @@ function DirectRisk(props) {
     return (
         <>
             <section className="row">
-                <article className="col-md-12">
+            <article className="col-md-2">
+            </article>
+                <article className="col-md-8">
                     <PlotBar id="plbDeforestation" 
                         title="Deforestación potencial"
                         description="El siguiente gráfico le permite observar cual ha sido la deforestación potencial
@@ -17,7 +19,13 @@ function DirectRisk(props) {
                         x="label" 
                         y="def_area"  />
                 </article>
-                <article className="col-md-12">
+            <article className="col-md-2">
+            </article>
+            </section>
+            <section className="row">
+                <article className="col-md-2">
+                </article>
+                <article className="col-md-8">
                     <PlotBar id="plbDistance" 
                         title="Distancia a deforestación"
                         description="El siguiente gráfico le permite observar cual es la distancia al punto más cercano
@@ -25,6 +33,8 @@ function DirectRisk(props) {
                         datum={props.datum}
                         x="label" 
                         y="def_dist"  />
+                </article>
+                <article className="col-md-2">
                 </article>
             </section>
         </>
